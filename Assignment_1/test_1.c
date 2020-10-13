@@ -8,44 +8,76 @@
 #include <math.h>
 
 
-void encryptDecrypt(char inpString[],char* key);
+void otp_encrypt_decrypt(char inpString[],char* key);
 
 void main(int argc, char** argv)    
 {
-        FILE *f;
-        int i=0;       
-        char *key;
-        char plaintext[10] = "Hello";
-        int SALT_LEN = strlen(plaintext);
-        key = (char*)malloc(sizeof(char)*SALT_LEN);
+        
+        int i = 0;       
+        // char plaintext[10] = "Hello";
+        
+        // non buffer overflowed input
+        unsigned int len_max = 128;
+        unsigned int current_size = 0;
+    
+        char *plaintext = malloc(len_max);
+        current_size = len_max;
 
-        /*open file */
+        printf("\nInput:");
+
+        if(plaintext != NULL)
+        {
+                int c = EOF;
+                unsigned int i =0;
+                //accept user input until hit enter or end of file
+                while (( c = getchar() ) != '\n' && c != EOF)
+                {
+                        plaintext[i++]=(char)c;
+
+                        //if i reached maximize size then realloc size
+                        if(i == current_size)
+                        {
+                                current_size = i+len_max;
+                                plaintext = realloc(plaintext, current_size);
+                        }
+                }
+
+                plaintext[i] = '\0';
+        }
+        // random generator
+        FILE *f;
+        char* key;
+        int N = strlen(plaintext);
+        key = (char*)malloc(sizeof(char)*N);
+
+        //open file 
         f = fopen("/dev/urandom", "r");
 
-        while( i < SALT_LEN)  {
+        while( i < N)  {
              key[i]  = fgetc(f);
              key[i] = abs(key[i]);
 
              if(fgetc(f) == EOF) {
                    exit(1);
              }
-                printf("%d\n", key[i]);
                 i++;
         }
-        printf("The key is:%s\n", key);
-
+        // for demo
         printf("Encrypted String: ");
-        encryptDecrypt(plaintext,key);
+        otp_encrypt_decrypt(plaintext,key);
         printf("\n");
 
         printf("Decrypted String :");
-        encryptDecrypt(plaintext,key);
+        otp_encrypt_decrypt(plaintext,key);
         printf("\n");
 
+        free(plaintext);
+        plaintext = NULL;
+        return;
 
 }
 
-void encryptDecrypt(char inpString[],char* key)
+void otp_encrypt_decrypt(char inpString[],char* key)
 {
         int len = strlen(inpString);
         int i;
