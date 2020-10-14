@@ -84,7 +84,12 @@ void ceasars_cipher(int flag, char inpString[], int key)
 	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
 	        {
 	            inpString[i] = (inpString[i] - 'A' + key) % 26 + 65;
-	        }      
+	        } 
+
+	        else if(isdigit(inpString[i]))
+	        {
+	        	inpString[i] = (inpString[i] - '0' + key) % 26 + 48;
+	        }     
 	    }
 
 	    printf("\n%s\n", inpString);
@@ -102,6 +107,11 @@ void ceasars_cipher(int flag, char inpString[], int key)
 	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
 	        {
 	            inpString[i] = (inpString[i] - 'A' - key) % 26 + 65;
+	        }
+
+	        else if(isdigit(inpString[i]))
+	        {
+	        	inpString[i] = (inpString[i] - '0' - key) % 26 + 48;
 	        }      
 	    }
 
