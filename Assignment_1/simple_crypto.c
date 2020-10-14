@@ -119,3 +119,37 @@ void ceasars_cipher(int flag, char inpString[], int key)
 	}
 
 }
+
+void vigenere(int flag, char inpString[], char* key)
+{
+	int ptLength = strlen(inpString);
+	int keyLength = strlen(key);
+	int i = 0, j = 0;
+	char newKey[ptLength];
+
+	for (;i < ptLength; i++,j++)
+	{
+		if (j == keyLength)
+			j = 0;
+
+		newKey[i] = key[j];
+	}
+
+	// newKey[i] = '\0';
+	if (flag == 0){
+		for (i=0; i < ptLength; i++)
+		{
+			inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
+		}
+	}
+	
+	else
+	{
+		for (i = 0; i < ptLength; i++)
+		{
+			inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
+		}
+	}
+
+	printf("%s\n", inpString);
+}

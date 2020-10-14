@@ -14,7 +14,6 @@ void main(int argc, char** argv)
 {
         
         int i = 0;       
-        // char plaintext[10] = "Hello";
         
         // non buffer overflowed input
         unsigned int len_max = 128;
