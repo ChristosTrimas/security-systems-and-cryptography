@@ -1,29 +1,16 @@
-#include "simple_crypto.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <ctype.h>
 
-char* randomGenerator(int N)
-{
-	FILE *f;
-    char* key;
-    int N = strlen(plaintext);
-    key = (char*)malloc(sizeof(char)*N);
+void ceasars_cipher(int flag, char inpString[], int key);
 
-    //open file 
-    f = fopen("/dev/urandom", "r");
-
-    while( i < N)
-    {
-    	key[i]  = fgetc(f);
-        key[i] = abs(key[i]);
-
-        if(fgetc(f) == EOF) 
-        {
-        	exit(1)
-        }
-        i++;
-    }
-}
-
-char* nonBufferedOvfInput()
+void main(int argc, char** argv)
 {
 	unsigned int len_max = 128;
     unsigned int current_size = 0;
@@ -31,7 +18,7 @@ char* nonBufferedOvfInput()
     char *plaintext = malloc(len_max);
     current_size = len_max;
 
-    printf("\nInput:");
+    printf("\nInput: ");
 
     if(plaintext != NULL)
     {
@@ -52,19 +39,15 @@ char* nonBufferedOvfInput()
 
             plaintext[i] = '\0';
     }
-}
+    //for demo with the generaor above
+    printf("\nKey: ");
+    int key;
+    scanf("%d",&key);
 
-void otp_encrypt_decrypt(char inpString[],char* key)
-{
-    int len = strlen(inpString);
-    int i;
+    ceasars_cipher(0,plaintext,key);
+    ceasars_cipher(1,plaintext,key);
 
-    for (i=0; i < len; i++)
-    {
-        inpString[i] = inpString[i] ^ key[i];
-    }
-
-    printf("%s\n", inpString);                                   
+    return;
 }
 
 void ceasars_cipher(int flag, char inpString[], int key)
