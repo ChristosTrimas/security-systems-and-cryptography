@@ -53,25 +53,66 @@ void main(int argc, char** argv)
 void ceasars_cipher(int flag, char inpString[], int key)
 {
 	int i = 0 , j = strlen(inpString);
-
+	char ch;
 	if (flag == 0){	//encryption
 		for (; i < j; i++)
 	    {
 	        // for lowercase letters
 	        if (islower(inpString[i]) && isalpha(inpString[i]))
 	        {
-	            inpString[i] = (inpString[i] - 'a' + key) % 26 + 97;
+	            ch = (inpString[i] + key);
+	            
+	            if (ch > 'z')
+	            {
+	            	inpString[i] = (inpString[i] - 'a' + key) % 26 + 48;
+	            	
+	            	if(inpString[i] > 'z')
+	            		
+	            		inpString[i] = inpString[i] - 75;
+	            }
+	            else
+	            {
+	            	inpString[i] = ch;
+	            }	            
 	        }
 	        
 	        // for uppercase letters
 	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
 	        {
-	            inpString[i] = (inpString[i] - 'A' + key) % 26 + 65;
+	            ch = (inpString[i] + key);
+
+	            if (ch > 'Z' && ch < 'a')
+	            {
+	            	inpString[i] = (inpString[i] - 'A' + key) % 26 + 97;
+
+	            	if (inpString[i] > 'Z' && inpString[i] < 'a')
+	            	{
+	            		inpString[i] = inpString[i] + 6;
+	            	}
+	            }
+	            else
+	            {
+	            	inpString[i] = ch;
+	            }	            
 	        } 
 
 	        else if(isdigit(inpString[i]))
 	        {
-	        	inpString[i] = (inpString[i] - '0' + key) % 26 + 48;
+	        	ch = (inpString[i] + key);
+
+	        	if(ch > '9' && ch < 'A')
+	        	{
+		        	inpString[i] = (inpString[i] - '0' + key) % 10 + 65;
+
+		        	if (inpString[i] > '9' && inpString[i] < 'A')
+	            	{
+	            		inpString[i] = inpString[i] + 6;
+	            	}
+	        	}
+	        	else
+	            {
+	            	inpString[i] = ch;
+	            }
 	        }     
 	    }
 
@@ -83,18 +124,59 @@ void ceasars_cipher(int flag, char inpString[], int key)
 	        // for lowercase letters
 	        if (islower(inpString[i]) && isalpha(inpString[i]))
 	        {
-	            inpString[i] = (inpString[i] - 'a' - key) % 26 + 97;
+	            ch = (inpString[i] - key);
+	            
+	            if (ch > 'z')
+	            {
+	            	inpString[i] = (inpString[i] - 'a' - key) % 26 + 48;
+	            	
+	            	if(inpString[i] > 'z')
+	            		
+	            		inpString[i] = inpString[i] - 75;
+	            }
+	            else
+	            {
+	            	inpString[i] = ch;
+	            }	            
 	        }
 	        
 	        // for uppercase letters
 	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
 	        {
-	            inpString[i] = (inpString[i] - 'A' - key) % 26 + 65;
-	        }
+	            ch = (inpString[i] - key);
+
+	            if (ch > 'Z' && ch < 'a')
+	            {
+	            	inpString[i] = (inpString[i] - 'A' - key) % 26 + 97;
+
+	            	if (inpString[i] > 'Z' && inpString[i] < 'a')
+	            	{
+	            		inpString[i] = inpString[i] + 6;
+	            	}
+	            }
+	            else
+	            {
+	            	inpString[i] = ch;
+	            }	            
+	        } 
 
 	        else if(isdigit(inpString[i]))
 	        {
-	        	inpString[i] = (inpString[i] - '0' - key) % 26 + 48;
+	        	ch = (inpString[i] - key);
+
+	        	if(ch > '9' && ch < 'A')
+	        	{
+		        	inpString[i] = (inpString[i] - '0' - key) % 10 + 65;
+
+		        	if (inpString[i] > '9' && inpString[i] < 'A')
+	            	{
+	            		inpString[i] = inpString[i] + 6;
+	            	}
+	        	}
+	        	else
+	            {
+	            	inpString[i] = ch;
+	            }
 	        }      
 	    }
 
