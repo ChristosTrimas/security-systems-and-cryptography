@@ -67,57 +67,57 @@ void otp_encrypt_decrypt(char inpString[],char* key)
     printf("%s\n", inpString);                                   
 }
 
-void ceasars_cipher(int flag, char inpString[], int key)
+void ceasars_cipher(char inpString[], int key)
 {
-	int i = 0 , j = strlen(inpString);
+    char newAlphabet[62],newCharacter[strlen(inpString)];
+    int i,j;
+    //maybe a func?
+    for(j=0,i=48;j<10;j++)
+    {
+        newAlphabet[j] = i;
+        i++;
+    } 
 
-	if (flag == 0){	//encryption
-		for (; i < j; i++)
-	    {
-	        // for lowercase letters
-	        if (islower(inpString[i]) && isalpha(inpString[i]))
-	        {
-	            inpString[i] = (inpString[i] - 'a' + key) % 26 + 97;
-	        }
-	        
-	        // for uppercase letters
-	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
-	        {
-	            inpString[i] = (inpString[i] - 'A' + key) % 26 + 65;
-	        } 
+    for(i=65;j<36;j++)
+    {
+        newAlphabet[j] = i;
+        i++;
+    }
+    for(i=97;j<62;j++)
+    {
+        newAlphabet[j] = i;
+        i++;
+    }
 
-	        else if(isdigit(inpString[i]))
-	        {
-	        	inpString[i] = (inpString[i] - '0' + key) % 26 + 48;
-	        }     
-	    }
+    i=0,j=0;
 
-	    printf("\n%s\n", inpString);
-	}
-	else{ 	//encryption
-		for (; i < j; i++)
-	    {
-	        // for lowercase letters
-	        if (islower(inpString[i]) && isalpha(inpString[i]))
-	        {
-	            inpString[i] = (inpString[i] - 'a' - key) % 26 + 97;
-	        }
-	        
-	        // for uppercase letters
-	        else if(isupper(inpString[i]) && isalpha(inpString[i]))
-	        {
-	            inpString[i] = (inpString[i] - 'A' - key) % 26 + 65;
-	        }
+    for(i=0;i<strlen(inpString);i++)
+    {
+        for(j=0;j<62;j++)
+        {
+            if(inpString[i] == newAlphabet[j])
+            {                   
+                newCharacter[i] = newAlphabet[(j+key)%62];
+                printf("%c",newCharacter[i]);
+            }
+        }
+    }
+    printf("\n");
 
-	        else if(isdigit(inpString[i]))
-	        {
-	        	inpString[i] = (inpString[i] - '0' - key) % 26 + 48;
-	        }      
-	    }
 
-	    printf("\n%s\n", inpString);
-	}
+    for(i=0;i<strlen(newCharacter);i++)
+    {
+        for(j=0;j<62;j++)
+        {
+            if(newCharacter[i] == newAlphabet[j])
+            {                   
+                inpString[i] = newAlphabet[(j-key+62)%62];
 
+                printf("%c",inpString[i]);
+            }
+        }
+    }
+    printf("\n");
 }
 
 void vigenere(int flag, char inpString[], char* key)

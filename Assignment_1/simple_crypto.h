@@ -38,7 +38,7 @@ void otp_encrypt_decrypt(char inpString[],char* key);
 ** plaintext.										 *
 ******************************************************/
 
-void ceasars_cipher(int flag, char inpString[], int key);
+void ceasars_cipher(char inpString[], int key);
 
 /*****************************************************
 ** Caesars cipher encrypt/decrypt algorithm			 *

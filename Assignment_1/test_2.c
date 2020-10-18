@@ -8,7 +8,7 @@
 #include <math.h>
 #include <ctype.h>
 
-void ceasars_cipher(int flag, char inpString[], int key);
+void ceasars_cipher(char inpString[], int key);
 
 int main(int argc, char** argv)
 {
@@ -44,14 +44,13 @@ int main(int argc, char** argv)
     int key;
     scanf("%d",&key);
 
-    ceasars_cipher(0,plaintext,key);
-    // ceasars_cipher(1,plaintext,key);
+    ceasars_cipher(plaintext,key);
     free(plaintext);
 
     return 0;
 }
 
-void ceasars_cipher(int flag, char inpString[], int key)
+void ceasars_cipher(char inpString[], int key)
 {
     char newAlphabet[62],newCharacter[strlen(inpString)];
     int i,j;
@@ -83,6 +82,21 @@ void ceasars_cipher(int flag, char inpString[], int key)
             {                   
                 newCharacter[i] = newAlphabet[(j+key)%62];
                 printf("%c",newCharacter[i]);
+            }
+        }
+    }
+    printf("\n");
+
+
+    for(i=0;i<strlen(newCharacter);i++)
+    {
+        for(j=0;j<62;j++)
+        {
+            if(newCharacter[i] == newAlphabet[j])
+            {                   
+                inpString[i] = newAlphabet[(j-key+62)%62];
+
+                printf("%c",inpString[i]);
             }
         }
     }
