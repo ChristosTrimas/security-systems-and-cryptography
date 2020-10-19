@@ -12,7 +12,7 @@
 #include <ctype.h>
 
 //helper functions
-char* randomGenerator(int N);
+char* randomGenerator(char plaintext[]);
 
 /*****************************************************
 ** Produces random ASCII characters using /urandom	 *

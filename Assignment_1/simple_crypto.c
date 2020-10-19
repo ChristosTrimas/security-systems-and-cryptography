@@ -1,8 +1,9 @@
 #include "simple_crypto.h"
 
-char* randomGenerator(int N)
+char* randomGenerator(char plaintext[])
 {
-	FILE *f;
+    FILE *f;
+    int i = 0;
     char* key;
     int N = strlen(plaintext);
     key = (char*)malloc(sizeof(char)*N);
@@ -12,26 +13,26 @@ char* randomGenerator(int N)
 
     while( i < N)
     {
-    	key[i]  = fgetc(f);
+        key[i]  = fgetc(f);
         key[i] = abs(key[i]);
 
         if(fgetc(f) == EOF) 
         {
-        	exit(1)
+            exit(1);
         }
         i++;
     }
+
+    return key;
 }
 
 char* nonBufferedOvfInput()
 {
-	unsigned int len_max = 128;
+    unsigned int len_max = 128;
     unsigned int current_size = 0;
     
     char *plaintext = malloc(len_max);
     current_size = len_max;
-
-    printf("\nInput:");
 
     if(plaintext != NULL)
     {
@@ -52,6 +53,8 @@ char* nonBufferedOvfInput()
 
             plaintext[i] = '\0';
     }
+
+    return plaintext;
 }
 
 void otp_encrypt_decrypt(char inpString[],char* key)
@@ -64,7 +67,7 @@ void otp_encrypt_decrypt(char inpString[],char* key)
         inpString[i] = inpString[i] ^ key[i];
     }
 
-    printf("%s\n", inpString);                                   
+    printf("%s", inpString);                                   
 }
 
 void ceasars_cipher(char inpString[], int key)
@@ -122,34 +125,34 @@ void ceasars_cipher(char inpString[], int key)
 
 void vigenere(int flag, char inpString[], char* key)
 {
-	int ptLength = strlen(inpString);
-	int keyLength = strlen(key);
-	int i = 0, j = 0;
-	char newKey[ptLength];
+    int ptLength = strlen(inpString);
+    int keyLength = strlen(key);
+    int i = 0, j = 0;
+    char newKey[ptLength];
 
-	for (;i < ptLength; i++,j++)
-	{
-		if (j == keyLength)
-			j = 0;
+    for (;i < ptLength; i++,j++)
+    {
+        if (j == keyLength)
+            j = 0;
 
-		newKey[i] = key[j];
-	}
+        newKey[i] = key[j];
+    }
 
-	// newKey[i] = '\0';
-	if (flag == 0){
-		for (i=0; i < ptLength; i++)
-		{
-			inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
-		}
-	}
-	
-	else
-	{
-		for (i = 0; i < ptLength; i++)
-		{
-			inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
-		}
-	}
+    // newKey[i] = '\0';
+    if (flag == 0){
+        for (i=0; i < ptLength; i++)
+        {
+            inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
+        }
+    }
+    
+    else
+    {
+        for (i = 0; i < ptLength; i++)
+        {
+            inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
+        }
+    }
 
-	printf("%s\n", inpString);
+    printf("%s\n", inpString);
 }
