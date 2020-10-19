@@ -39,7 +39,7 @@ char* nonBufferedOvfInput()
             int c = EOF;
             unsigned int i =0;
             //accept user input until hit enter or end of file
-            while (( c = getchar() ) != '\n' && c != EOF)
+            while (( c = getchar()) != '\n' && c != EOF)
             {
                 plaintext[i++]=(char)c;
 
@@ -52,6 +52,37 @@ char* nonBufferedOvfInput()
             }
 
             plaintext[i] = '\0';
+    }
+
+    return plaintext;
+}
+
+char* nonBufferedOvfInputUpper()
+{
+    unsigned int len_max = 128;
+    unsigned int current_size = 0;
+    
+    char *plaintext = malloc(len_max);
+    current_size = len_max;
+
+    if (plaintext != NULL)
+    {
+        int c = EOF;
+        unsigned int i =0;
+        //accept user input until hit enter or end of file
+        while (( c = toupper(getchar() )) != '\n' && c != EOF)
+        {
+            plaintext[i++]=(char)c;
+
+            //if i reached maximize size then realloc size
+            if (i == current_size)
+            {
+                current_size = i+len_max;
+                plaintext = realloc(plaintext, current_size);
+            }
+        }
+
+        plaintext[i] = '\0';
     }
 
     return plaintext;
@@ -94,6 +125,7 @@ void ceasars_cipher(char inpString[], int key)
 
     i=0,j=0;
 
+    printf("[Caesars] encrypted: ");
     for(i=0;i<strlen(inpString);i++)
     {
         for(j=0;j<62;j++)
@@ -107,7 +139,7 @@ void ceasars_cipher(char inpString[], int key)
     }
     printf("\n");
 
-
+    printf("[Caesars] decrypted: ");    
     for(i=0;i<strlen(newCharacter);i++)
     {
         for(j=0;j<62;j++)
@@ -123,7 +155,7 @@ void ceasars_cipher(char inpString[], int key)
     printf("\n");
 }
 
-void vigenere(int flag, char inpString[], char* key)
+void vigenere(char inpString[], char* key)
 {
     int ptLength = strlen(inpString);
     int keyLength = strlen(key);
@@ -138,20 +170,18 @@ void vigenere(int flag, char inpString[], char* key)
         newKey[i] = key[j];
     }
 
-    // newKey[i] = '\0';
-    if (flag == 0){
-        for (i=0; i < ptLength; i++)
-        {
-            inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
-        }
-    }
-    
-    else
+    printf("[Vigenere] encrypted: ");
+    for (i=0; i < ptLength; i++)
     {
-        for (i = 0; i < ptLength; i++)
-        {
-            inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
-        }
+        inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
+    }
+
+    printf("%s",inpString);
+    
+    printf("\n[Vigenere] decrypted: "); 
+    for (i = 0; i < ptLength; i++)
+    {
+        inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
     }
 
     printf("%s\n", inpString);

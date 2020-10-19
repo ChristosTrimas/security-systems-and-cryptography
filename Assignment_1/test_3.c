@@ -69,12 +69,11 @@ void main(int argv, char** argc)
             key[i] = '\0';
     }
 
-    vigenere(0,plaintext,key);
-    vigenere(1,plaintext,key);
+    vigenere(plaintext,key);
     return;
 }
 
-void vigenere(int flag, char inpString[], char* key)
+void vigenere(char inpString[], char* key)
 {
 	int ptLength = strlen(inpString);
 	int keyLength = strlen(key);
@@ -89,21 +88,18 @@ void vigenere(int flag, char inpString[], char* key)
 		newKey[i] = key[j];
 	}
 
-	// newKey[i] = '\0';
-	if (flag == 0){
-		for (i=0; i < ptLength; i++)
-		{
-			inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
-		}
-	}
-	
-	else
-	{
-		for (i = 0; i < ptLength; i++)
-		{
-			inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
-		}
-	}
+	printf("\n[Vigenere] encrypted: ");
+	for (i=0; i < ptLength; i++)
+    {
+        inpString[i] = ((inpString[i] + newKey[i]) % 26) +'A';
+    }
+    printf("\n");
+    
+    printf("\n[Vigenere] decrypted: ");	
+	for (i = 0; i < ptLength; i++)
+    {
+        inpString[i] = (((inpString[i] - newKey[i]) + 26) % 26) + 'A';
+    }
 
 	printf("%s\n", inpString);
 }
