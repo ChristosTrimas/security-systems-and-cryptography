@@ -111,7 +111,7 @@ void ceasars_cipher(char inpString[], int key)
         {
             if(newCharacter[i] == newAlphabet[j])
             {                   
-                inpString[i] = newAlphabet[(j-key+62)%62];
+                inpString[i] = newAlphabet[(j-key+62*key)%62];
 
                 printf("%c",inpString[i]);
             }
