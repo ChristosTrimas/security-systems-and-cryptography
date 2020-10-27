@@ -37,8 +37,7 @@ const EVP_CIPHER *bit_check(int bit_mode);
  * Prints the hex value of the input
  * 16 values per line
  */
-void
-print_hex(unsigned char *data, size_t len)
+void print_hex(unsigned char *data, size_t len)
 {
 	size_t i;
 
@@ -58,8 +57,7 @@ print_hex(unsigned char *data, size_t len)
 /*
  * Prints the input as string
  */
-void
-print_string(unsigned char *data, size_t len)
+void print_string(unsigned char *data, size_t len)
 {
 	size_t i;
 
@@ -77,8 +75,7 @@ print_string(unsigned char *data, size_t len)
  * Prints the usage message
  * Describe the usage of the new arguments you introduce
  */
-void
-usage(void)
+void usage(void)
 {
 	printf(
 	    "\n"
@@ -108,8 +105,7 @@ usage(void)
  * Checks the validity of the arguments
  * Check the new arguments you introduce
  */
-void
-check_args(char *input_file, char *output_file, unsigned char *password, 
+void check_args(char *input_file, char *output_file, unsigned char *password, 
     int bit_mode, int op_mode)
 {
 	if (!input_file) {
@@ -142,8 +138,7 @@ check_args(char *input_file, char *output_file, unsigned char *password,
 /*
  * Generates a key using a password
  */
-void
-keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
+void keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
     int bit_mode)
 {
 
@@ -166,8 +161,7 @@ keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
 /*
  * Encrypts the data
  */
-void
-encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+void encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     unsigned char *iv, unsigned char *ciphertext, int bit_mode)
 {
 
@@ -191,8 +185,7 @@ encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 /*
  * Decrypts the data and returns the plaintext size
  */
-int
-decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     unsigned char *iv, unsigned char *plaintext, int bit_mode)
 {
 	int plaintext_len;
@@ -210,8 +203,7 @@ decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 /*
  * Generates a CMAC
  */
-void
-gen_cmac(unsigned char *data, size_t data_len, unsigned char *key, 
+void gen_cmac(unsigned char *data, size_t data_len, unsigned char *key, 
     unsigned char *cmac, int bit_mode)
 {
 
@@ -223,8 +215,7 @@ gen_cmac(unsigned char *data, size_t data_len, unsigned char *key,
 /*
  * Verifies a CMAC
  */
-int
-verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
+int verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
 {
 	int verify;
 
