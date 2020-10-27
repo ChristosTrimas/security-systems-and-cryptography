@@ -28,7 +28,10 @@ int verify_cmac(unsigned char *, unsigned char *);
 
 /* TODO Declare your function prototypes here... */
 
+//could be in a .h file for cleaner code
 
+unsigned char *readText(char* ,unsigned long *);
+void writeText(char* ,unsigned char *, unsigned long );
 
 /*
  * Prints the hex value of the input
@@ -145,6 +148,28 @@ keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
 {
 
 	/* TODO Task A */
+	const EVP_CIPHER* cipher;
+
+	//first check the bit mode
+	if (bit_mode == 128)
+	{
+		cipher = EVP_get_cipherbyname("aes-128-ecb");
+	}
+	else if (bit_mode == 256)
+	{
+		cipher = EVP_get_cipherbyname("aes-256-ecb");
+	}
+	else
+	{
+		fprintf(stderr,"Something went wrong with the bit size.\n");
+		exit(1);
+	}
+	
+	hash_func = EVP_sha1();
+
+	EVP_ByteToKey(cipher, hash_func, NULL, password, strlen((const char*) password), 1, key, iv);
+	printf("\nHex key:"); //delete this before sending zip
+	print_hex(key, bit_mode / 8);
 
 }
 
@@ -158,7 +183,16 @@ encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 {
 
 	/* TODO Task B */
+	EVP_CIPHER_CTX* ctx;
+	int len;
 
+	ctx = EVP_CIPHER_CTX_new();
+
+	EVP_EncryptInit_ex(ctx, AES_ECB(bit_mode), NULL, key, NULL);
+	EVP_EncryptUpdate(ctx,ciphertext,&len,plaintext,plaintext_len);
+	EVP_EncryptFinal_ex(ctx, ciphertext + len, &len);
+
+	EVP_CIPHER_CTX_free(ctx);
 }
 
 
@@ -170,10 +204,12 @@ decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     unsigned char *iv, unsigned char *plaintext, int bit_mode)
 {
 	int plaintext_len;
+	EVP_CIPHER_CTX* ctx;
 
 	plaintext_len = 0;
 
 	/*TODO Task C */
+	
 
 	return plaintext_len;
 }
