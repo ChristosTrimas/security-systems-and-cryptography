@@ -223,6 +223,17 @@ void gen_cmac(unsigned char *data, size_t data_len, unsigned char *key,
 {
 
 	/* TODO Task D */
+	CMAC_CTX *ctx;
+	size_t len, key_len = bit_mode / 8;
+	const EVP_CIPHER* cipher = bit_check(bit_mode);
+
+	ctx = CMAC_CTX_new();
+
+	CMAC_Init(ctx, key, key_len, cipher, NULL);
+	CMAC_Update(ctx, data, data_len);
+	CMAC_Final(ctx, cmac, &len);
+
+	CMAC_CTX_free(ctx);
 
 }
 
@@ -238,10 +249,13 @@ int verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
 
 	/* TODO Task E */
 
+	if(!(verify = memcmp(cmac1, cmac2, BLOCK_SIZE)))
+	{
+		exit(EXIT_FAILURE);
+	}
+
 	return verify;
 }
-
-
 
 /* TODO Develop your functions here... */
 
@@ -326,12 +340,13 @@ int main(int argc, char **argv)
 	op_mode = -1;
 
 	//my variables
-	
-	unsigned char* input_data = NULL;  // input data like the name
-	unsigned long input_len = 0;	   // length of input
-	unsigned char* output_data = NULL; // output data 
-	unsigned long output_len = 0;	   // length of output
-	unsigned char key[256], iv[256];
+	unsigned char cmac_size[BLOCK_SIZE]; 	// that's from the hints
+	unsigned char key[256], iv[256];   		// key and iv size.Most of the times they are going to be NULL though hehe
+	unsigned char* input_data = NULL;   	// input data like the name
+	unsigned long input_len = 0;	    	// length of input
+	unsigned char* output_data = NULL; 	 	// output data 
+	unsigned long output_len = 0;	    	// length of output
+	int verification;
 
 
 	/*
@@ -379,6 +394,16 @@ int main(int argc, char **argv)
 
 	/* TODO Develop the logic of your tool here... */
 
+	/* First we check for the file we want to read and then using the keygen function above
+	*   We create a key. The keygen function is also called KDF which stands for Key Derivation Function
+	*   After we have the key, depending the user's input, the program can excecute one of the following:
+	*   1) Symmetric encryption of a file the user gives as input. The key is created in 126 or 258 bits and it is based on the user's password.
+	*   2) Symmetric decryption of a encrypted file. The password needs to be the same that was used for the encryption of the file.
+	*   3) Encryption and data signing. It is a simple cipher-based message authentication code.
+	*   4) Decryption and data verification. How can we be sure we did the above function correct? This func seperates the CMAC from the ciphertext and then decrypts it.
+	*   	  using then the plaintext from the decryption it generates its CMAC and compares it to the one that came from the ciphertext and there you have it. 
+	*   	  A message verification*/
+
 	if (input_file != NULL)
 	{
 		input_data = readText(input_file, &input_len);
@@ -406,6 +431,30 @@ int main(int argc, char **argv)
 				output_len = decrypt(input_data, input_len, key, iv, output_data, bit_mode);
 				break;
 
+		/* sign */
+		case 2:
+				output_len = input_len - (input_len % BLOCK_SIZE) + 2 * BLOCK_SIZE;
+				output_data = malloc(output_len);
+
+				encrypt(input_data, input_len, key, iv, output_data, bit_mode);
+				gen_cmac(input_data, input_len, key, output_data + (output_len - BLOCK_SIZE), bit_mode);
+				break;
+		
+		/* verify */	
+		case 3:
+				output_data = malloc(input_len);
+				output_len = decrypt(input_data, input_len, key, iv, output_data, bit_mode);
+				gen_cmac(output_data, output_len, key, cmac_size, bit_mode);
+
+				verification = verify_cmac(cmac_size, input_data + (input_len - BLOCK_SIZE));
+
+				if (verification == 0)
+				{
+					fprintf(stderr, "Something went wrong on the verification.\n");
+					exit(EXIT_FAILURE);
+				}
+
+				break;
 		default:
 				break;
 	}
@@ -414,10 +463,6 @@ int main(int argc, char **argv)
 	{
 		writeText(output_file, output_data, output_len);
 	}
-
-	/* sign */
-
-	/* verify */
 		
 	/* Clean up */
 	free(input_file);
@@ -425,7 +470,6 @@ int main(int argc, char **argv)
 	free(password);
 	free(input_data);
 	free(output_data);
-
 
 	/* END */
 	return 0;
