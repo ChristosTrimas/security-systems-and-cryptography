@@ -410,8 +410,10 @@ int main(int argc, char **argv)
 				break;
 	}
 
-	if(output_len)
+	if(output_len !=0)
+	{
 		writeText(output_file, output_data, output_len);
+	}
 
 	/* sign */
 
