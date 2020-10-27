@@ -32,7 +32,7 @@ int verify_cmac(unsigned char *, unsigned char *);
 
 unsigned char *readText(char* ,unsigned long *);
 void writeText(char* ,unsigned char *, unsigned long );
-
+EVP_CIPHER *bit_check(int bit_mode);
 /*
  * Prints the hex value of the input
  * 16 values per line
@@ -149,6 +149,7 @@ keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
 
 	/* TODO Task A */
 	const EVP_CIPHER* cipher;
+	const EVP_MD* hash_func = NULL;
 
 	//first check the bit mode
 	if (bit_mode == 128)
@@ -167,7 +168,8 @@ keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
 	
 	hash_func = EVP_sha1();
 
-	EVP_ByteToKey(cipher, hash_func, NULL, password, strlen((const char*) password), 1, key, iv);
+	//no salt
+	EVP_BytesToKey(cipher, hash_func, NULL, password, strlen((const char*) password), 1, key, iv);
 	printf("\nHex key:"); //delete this before sending zip
 	print_hex(key, bit_mode / 8);
 
@@ -184,11 +186,26 @@ encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 	/* TODO Task B */
 	EVP_CIPHER_CTX* ctx;
+	const EVP_CIPHER* cipher;
 	int len;
 
 	ctx = EVP_CIPHER_CTX_new();
 
-	EVP_EncryptInit_ex(ctx, AES_ECB(bit_mode), NULL, key, NULL);
+	if (bit_mode == 128)
+	{
+		cipher = EVP_get_cipherbyname("aes-128-ecb");
+	}
+	else if (bit_mode == 256)
+	{
+		cipher = EVP_get_cipherbyname("aes-256-ecb");
+	}
+	else
+	{
+		fprintf(stderr,"Something went wrong with the bit size.\n");
+		exit(1);
+	}
+
+	EVP_EncryptInit_ex(ctx, cipher, NULL, key, NULL);
 	EVP_EncryptUpdate(ctx,ciphertext,&len,plaintext,plaintext_len);
 	EVP_EncryptFinal_ex(ctx, ciphertext + len, &len);
 
@@ -204,12 +221,12 @@ decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     unsigned char *iv, unsigned char *plaintext, int bit_mode)
 {
 	int plaintext_len;
-	EVP_CIPHER_CTX* ctx;
+	// EVP_CIPHER_CTX* ctx;
 
 	plaintext_len = 0;
 
 	/*TODO Task C */
-	
+
 
 	return plaintext_len;
 }
@@ -247,7 +264,36 @@ verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
 
 /* TODO Develop your functions here... */
 
+unsigned char* readText(char *path, unsigned long* data_len)
+{
+	unsigned char* data;
+	FILE *fp;
 
+	fp = fopen(path,"rb");
+
+	fseek(fp, 0, SEEK_END);
+	*data_len = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	data = malloc(*data_len);
+
+	if (data == 0)
+	{
+		if(fread(data, 1, *data_len, fp) != *data_len)
+			exit(1);
+	}
+
+	fclose(fp);
+
+	return data;
+}
+
+void writeText(char* path, unsigned char *data, unsigned long data_len)
+{
+	FILE *fp;
+
+	fp = fopen(path, "wb");
+	fwrite(data, 1, data_len, fp);
+}
 
 /*
  * Encrypts the input file and stores the ciphertext to the output file
@@ -276,6 +322,14 @@ main(int argc, char **argv)
 	password = NULL;
 	bit_mode = -1;
 	op_mode = -1;
+
+	//my variables
+	
+	unsigned char* input_data = NULL;  // input data like the name
+	unsigned long input_len = 0;	   // length of input
+	unsigned char* output_data = NULL; // output data 
+	unsigned long output_len = 0;	   // length of output
+	unsigned char key[256], iv[256];
 
 
 	/*
@@ -321,33 +375,55 @@ main(int argc, char **argv)
 	/* check arguments */
 	check_args(input_file, output_file, password, bit_mode, op_mode);
 
-
-
 	/* TODO Develop the logic of your tool here... */
 
-
-
+	if (input_file != NULL)
+	{
+		input_data = readText(input_file, &input_len);
+	}
 
 	/* Initialize the library */
 
-
 	/* Keygen from password */
 
-
+	keygen(password, key, iv, bit_mode);
 	/* Operate on the data according to the mode */
-	/* encrypt */
+	switch(op_mode)
+	{
+		/* encrypt */
+		case 0: 
+				output_len = input_len - (input_len % BLOCK_SIZE) + BLOCK_SIZE;
+				output_data  = malloc(output_len);
 
-	/* decrypt */
+				encrypt(input_data, input_len, key, iv, output_data, bit_mode);
+				break;
+
+		/* decrypt */
+		case 1: 
+				output_data = malloc(input_len);
+				output_len = decrypt(input_data, input_len, key, iv, output_data, bit_mode);
+				break;
+
+		default:
+				break;
+	}
+
+	if(output_len)
+	{
+		writeText(output_file, output_data, output_len);
+	}
+
 
 	/* sign */
 
 	/* verify */
 		
-
 	/* Clean up */
 	free(input_file);
 	free(output_file);
 	free(password);
+	free(input_data);
+	free(output_data);
 
 
 	/* END */
