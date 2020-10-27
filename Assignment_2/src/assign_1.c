@@ -32,7 +32,7 @@ int verify_cmac(unsigned char *, unsigned char *);
 
 unsigned char *readText(char* ,unsigned long *);
 void writeText(char* ,unsigned char *, unsigned long );
-EVP_CIPHER *bit_check(int bit_mode);
+const EVP_CIPHER *bit_check(int bit_mode);
 /*
  * Prints the hex value of the input
  * 16 values per line
@@ -151,27 +151,14 @@ keygen(unsigned char *password, unsigned char *key, unsigned char *iv,
 	const EVP_CIPHER* cipher;
 	const EVP_MD* hash_func = NULL;
 
-	//first check the bit mode
-	if (bit_mode == 128)
-	{
-		cipher = EVP_get_cipherbyname("aes-128-ecb");
-	}
-	else if (bit_mode == 256)
-	{
-		cipher = EVP_get_cipherbyname("aes-256-ecb");
-	}
-	else
-	{
-		fprintf(stderr,"Something went wrong with the bit size.\n");
-		exit(1);
-	}
-	
+	cipher = bit_check(bit_mode);
 	hash_func = EVP_sha1();
 
 	//no salt
 	EVP_BytesToKey(cipher, hash_func, NULL, password, strlen((const char*) password), 1, key, iv);
-	printf("\nHex key:"); //delete this before sending zip
-	print_hex(key, bit_mode / 8);
+
+	// printf("\nHex key:"); //delete this before sending zip
+	// print_hex(key, bit_mode / 8);
 
 }
 
@@ -191,19 +178,7 @@ encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 	ctx = EVP_CIPHER_CTX_new();
 
-	if (bit_mode == 128)
-	{
-		cipher = EVP_get_cipherbyname("aes-128-ecb");
-	}
-	else if (bit_mode == 256)
-	{
-		cipher = EVP_get_cipherbyname("aes-256-ecb");
-	}
-	else
-	{
-		fprintf(stderr,"Something went wrong with the bit size.\n");
-		exit(1);
-	}
+	cipher = bit_check(bit_mode);
 
 	EVP_EncryptInit_ex(ctx, cipher, NULL, key, NULL);
 	EVP_EncryptUpdate(ctx,ciphertext,&len,plaintext,plaintext_len);
@@ -287,12 +262,34 @@ unsigned char* readText(char *path, unsigned long* data_len)
 	return data;
 }
 
+// I hate files but that's life.
 void writeText(char* path, unsigned char *data, unsigned long data_len)
 {
 	FILE *fp;
 
 	fp = fopen(path, "wb");
 	fwrite(data, 1, data_len, fp);
+}
+
+const EVP_CIPHER *bit_check(int bit_mode)
+{
+	const EVP_CIPHER* cipher;
+
+	if (bit_mode == 128)
+	{
+		cipher = EVP_get_cipherbyname("aes-128-ecb");
+	}
+	else if (bit_mode == 256)
+	{
+		cipher = EVP_get_cipherbyname("aes-256-ecb");
+	}
+	else
+	{
+		fprintf(stderr,"Something went wrong with the bit size.\n");
+		exit(1);
+	}
+
+	return cipher;
 }
 
 /*
@@ -306,8 +303,7 @@ void writeText(char* path, unsigned char *data, unsigned long data_len)
  * Decrypts and verifies the input file and stores the plaintext to the output
  * file
  */
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int opt;			/* used for command line arguments */
 	int bit_mode;			/* defines the key-size 128 or 256 */
