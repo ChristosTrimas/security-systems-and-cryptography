@@ -188,14 +188,29 @@ void encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     unsigned char *iv, unsigned char *plaintext, int bit_mode)
 {
-	int plaintext_len;
-	// EVP_CIPHER_CTX* ctx;
-
+	int plaintext_len, decrypted_len;
+	EVP_CIPHER_CTX* ctx;
+	const EVP_CIPHER* cipher;
 	plaintext_len = 0;
+
 
 	/*TODO Task C */
 
+	ctx = EVP_CIPHER_CTX_new();
+	cipher = bit_check(bit_mode);
 
+	EVP_DecryptInit_ex(ctx, cipher, NULL, key, NULL);
+	EVP_DecryptUpdate(ctx, plaintext, &decrypted_len, ciphertext, ciphertext_len);
+
+	plaintext_len = decrypted_len;
+
+	EVP_DecryptFinal_ex(ctx, ciphertext + decrypted_len, &decrypted_len);
+
+	//add padding to the current plaintext length
+	plaintext_len += decrypted_len;
+
+	EVP_CIPHER_CTX_free(ctx);
+	
 	return plaintext_len;
 }
 
@@ -242,7 +257,7 @@ unsigned char* readText(char *path, unsigned long* data_len)
 	fseek(fp, 0, SEEK_SET);
 	data = malloc(*data_len);
 
-	if (data == 0)
+	if (data != 0)
 	{
 		if(fread(data, 1, *data_len, fp) != *data_len)
 			exit(1);
@@ -396,10 +411,7 @@ int main(int argc, char **argv)
 	}
 
 	if(output_len)
-	{
 		writeText(output_file, output_data, output_len);
-	}
-
 
 	/* sign */
 
