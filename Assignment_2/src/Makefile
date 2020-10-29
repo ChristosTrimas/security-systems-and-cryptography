@@ -11,5 +11,8 @@ all: $(TARGETS)
 assign_1: assign_1.c
 	$(CC) $(CCFLAGS) $(DBUG) -o $@ $< $(LIBSSL)
 
+run:
+	bash testing.sh
+
 clean:
 	rm -f $(TARGETS)
