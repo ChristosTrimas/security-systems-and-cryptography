@@ -423,12 +423,15 @@ int main(int argc, char **argv)
 				output_data  = malloc(output_len);
 
 				encrypt(input_data, input_len, key, iv, output_data, bit_mode);
+
+				printf("\nEncryption has been a success.");
 				break;
 
 		/* decrypt */
 		case 1: 
 				output_data = malloc(input_len);
 				output_len = decrypt(input_data, input_len, key, iv, output_data, bit_mode);
+				printf("\nDecryption has been a success.");
 				break;
 
 		/* sign */
@@ -438,6 +441,7 @@ int main(int argc, char **argv)
 
 				encrypt(input_data, input_len, key, iv, output_data, bit_mode);
 				gen_cmac(input_data, input_len, key, output_data + (output_len - BLOCK_SIZE), bit_mode);
+				printf("\nSignature has successfully been created");
 				break;
 		
 		/* verify */	
@@ -452,6 +456,10 @@ int main(int argc, char **argv)
 				{
 					fprintf(stderr, "Something went wrong on the verification.\n");
 					exit(EXIT_FAILURE);
+				}
+				else
+				{
+					printf("\nVerification Completed successfully");
 				}
 
 				break;
