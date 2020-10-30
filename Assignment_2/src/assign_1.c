@@ -249,12 +249,13 @@ int verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
 
 	/* TODO Task E */
 
-	if(!(verify = memcmp(cmac1, cmac2, BLOCK_SIZE)))
+	if((verify = memcmp(cmac1, cmac2, BLOCK_SIZE)))
 	{
-		exit(EXIT_FAILURE);
+		return 0;
 	}
 
-	return verify;
+	
+	return 1;
 }
 
 /* TODO Develop your functions here... */
