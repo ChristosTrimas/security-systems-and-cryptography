@@ -11,8 +11,8 @@ all: $(TARGETS)
 assign_1: assign_1.c
 	$(CC) $(CCFLAGS) $(DBUG) -o $@ $< $(LIBSSL)
 
-run:
-	bash testing.sh
+test:
+	bash run_tests.sh
 
 delete:
 	rm decryptme_256.txt hpy414_encryptme_128.txt verifyme_128.txt hpy414_signme_256.txt hpy414_signme_128.txt
