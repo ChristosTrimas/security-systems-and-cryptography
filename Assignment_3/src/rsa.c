@@ -35,7 +35,7 @@ size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 			}
 		}
 	}
-	
+
 	return primes;
 }
 
@@ -48,11 +48,20 @@ size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
  *
  * ret: the GCD
  */
-int
-gcd(int a, int b)
+int gcd(int a, int b)
 {
 
 	/* TODO */
+	int tmp;
+
+	while(a != 0)
+	{
+		tmp =a;
+		a = b % a;
+		b = tmp;
+	}
+
+	return b;
 
 }
 
