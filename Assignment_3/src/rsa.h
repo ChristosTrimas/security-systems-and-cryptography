@@ -10,6 +10,8 @@
 
 # define RSA_SIEVE_LIMIT 255
 
+int tmp_d; //if we have negative d, we can not use it in RSA
+
 /*
  * Sieve of Eratosthenes Algorithm
  * https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
@@ -19,8 +21,7 @@
  *
  * ret:  The prime numbers that are less or equal to the limit
  */
-size_t *
-sieve_of_eratosthenes(int, int *);
+size_t * sieve_of_eratosthenes(int, int *);
 
 
 /*
@@ -31,8 +32,7 @@ sieve_of_eratosthenes(int, int *);
  *
  * ret: the GCD
  */
-int
-gcd(int , int);
+int gcd(int , int);
 
 
 /*
@@ -43,8 +43,7 @@ gcd(int , int);
  *
  * ret: 'e'
  */
-size_t
-choose_e(size_t);
+size_t choose_e(size_t* , size_t* );
 
 
 /*
@@ -55,16 +54,14 @@ choose_e(size_t);
  *
  * ret: modular inverse
  */
-size_t
-mod_inverse(size_t, size_t);
+size_t mod_inverse(size_t, size_t);
 
 
 /*
  * Generates an RSA key pair and saves
  * each key in a different file
  */
-void
-rsa_keygen(void);
+void rsa_keygen(void);
 
 
 /*
@@ -74,8 +71,7 @@ rsa_keygen(void);
  * arg1: path to output file
  * arg2: path to key file
  */
-void
-rsa_encrypt(char *, char *, char *);
+void rsa_encrypt(char *, char *, char *);
 
 
 /*
@@ -85,7 +81,13 @@ rsa_encrypt(char *, char *, char *);
  * arg1: path to output file
  * arg2: path to key file
  */
-void
-rsa_decrypt(char *, char *, char *);
+void rsa_decrypt(char *, char *, char *);
+
+
+size_t compute_n(size_t , size_t );
+
+size_t calc_fi_n(size_t , size_t );
+
+size_t gcdExtended(size_t , size_t , size_t* , size_t* );
 
 #endif /* _RSA_H */

@@ -12,25 +12,25 @@
  */
 size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 {
-	size_t primes[];
-	size_t *prime = malloc(sizeof((size_t)*limit)+1);
+	size_t* primes;
+	size_t *prime = malloc((sizeof(size_t)*limit)+1);
 	size_t i,j,k=2;
 	/* TODO */	
 
-	for(i = 2; i <= n; i ++)
+	for(i = 2; i <= limit; i ++)
 		prime[i] = i;
 
-	for(i = 2; i*i <= n; i ++)
-		for(j = i*i; j <= n; j += i)
+	for(i = 2; i*i <= limit; i ++)
+		for(j = i*i; j <= limit; j += i)
 			prime[j] = 0;
 
-	for(i = 2; i <= n; i ++)
+	for(i = 2; i <= limit; i ++)
 	{
 		for (k=0; k < limit; k++)
 		{
 			if(prime[i] != 0)
 			{
-				printf("%d ",prime[i]);
+				printf("%d ",(int)prime[i]);
 				primes[k] = prime[i];
 			}
 		}
@@ -108,7 +108,7 @@ size_t choose_e(size_t* fi_n, size_t* n)
 		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123)
 		{
 			*fi_n = fi;
-			*n = compute_n(p,q)
+			*n = compute_n(p,q);
 			return e;
 		}
 	}
@@ -117,7 +117,7 @@ size_t choose_e(size_t* fi_n, size_t* n)
 
 // extra function No.3
 
-size_t gcdExtended(int a, int b, int* x, int* y) //geeks for geeks found 
+size_t gcdExtended(size_t a, size_t b, size_t* x, size_t* y) //geeks for geeks found 
 { 
     // Base Case 
     if (a == 0) { 
@@ -126,8 +126,8 @@ size_t gcdExtended(int a, int b, int* x, int* y) //geeks for geeks found
         return b; 
     } 
   
-    int x1, y1; // To store results of recursive call 
-    int gcd = gcdExtended(b % a, a, &x1, &y1); 
+    size_t x1, y1; // To store results of recursive call 
+    size_t gcd = gcdExtended(b % a, a, &x1, &y1); 
   
     // Update x and y using results of recursive 
     // call 
@@ -144,18 +144,17 @@ size_t gcdExtended(int a, int b, int* x, int* y) //geeks for geeks found
  *
  * ret: modular inverse
  */
-size_t
-mod_inverse(size_t e, size_t fi) // changed var names from a,b to e,fi respectively
+size_t mod_inverse(size_t e, size_t fi) // changed var names from a,b to e,fi respectively
 {
 
 	/* TODO */
-	size_t x, y, g = gcdextended(a, b, b&x, &y);
+	size_t x, y, g = gcdExtended(e, fi, &x, &y);
 
 	if(g != 1)
 		return -1;
-	if ((a*x) % b == 1)
+	if ((e*x) % fi == 1)
 		return x;
-	if ((a*y) % b == 1)
+	if ((e*y) % fi == 1)
 		return y;
 }
 
@@ -177,13 +176,12 @@ void rsa_keygen(void)
 	char* private_key_fl = "private.key";
 	char* public_key_fl = "public.key";
 	FILE* fp1, *fp2;
-	int tmp_d; //if we have negative d, we can not use it in RSA
 
 	printf("e = %ld\tf(n) = %ld\n",e, fi_n);
 	printf("\nd = %ld\tn = %ld\n",d, n);
 
-	if (int(d) < 0)
-		*tmp_d = 0;
+	if ((int)d < 0)
+		tmp_d = 0;
 
 	fp2 = fopen(public_key_fl, "wb");
 
@@ -206,8 +204,8 @@ void rsa_keygen(void)
  * arg1: path to output file
  * arg2: path to key file
  */
-void
-rsa_encrypt(char *input_file, char *output_file, char *key_file)
+
+void rsa_encrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
@@ -222,8 +220,8 @@ rsa_encrypt(char *input_file, char *output_file, char *key_file)
  * arg1: path to output file
  * arg2: path to key file
  */
-void
-rsa_decrypt(char *input_file, char *output_file, char *key_file)
+
+void rsa_decrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
