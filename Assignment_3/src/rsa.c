@@ -88,9 +88,9 @@ size_t calc_fi_n(size_t p, size_t q)
  *
  * ret: 'e'
  */
-size_t choose_e(size_t fi_n)
+size_t choose_e(size_t* fi_n, size_t* n)
 {
-	size_t e, fi, n;
+	size_t e, fi;
 	/* TODO */
 	size_t *prime = sieve_of_eratosthenes(RSA_SIEVE_LIMIT, NULL); //might delete the second arg later
 
@@ -107,8 +107,8 @@ size_t choose_e(size_t fi_n)
 
 		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123)
 		{
-			fi_n = fi;
-			n = compute_n(p,q)
+			*fi_n = fi;
+			*n = compute_n(p,q)
 			return e;
 		}
 	}
@@ -164,18 +164,38 @@ mod_inverse(size_t e, size_t fi) // changed var names from a,b to e,fi respectiv
  * Generates an RSA key pair and saves
  * each key in a different file
  */
-void
-rsa_keygen(void)
+void rsa_keygen(void)
 {
 	size_t p;
 	size_t q;
 	size_t n;
 	size_t fi_n;
-	size_t e;
-	size_t d;
+	size_t e = choose_e(&fi_n, &n);
+	size_t d = mod_inverse(e, fi_n);
 
 	/* TODO */
+	char* private_key_fl = "private.key";
+	char* public_key_fl = "public.key";
+	FILE* fp1, *fp2;
+	int tmp_d; //if we have negative d, we can not use it in RSA
 
+	printf("e = %ld\tf(n) = %ld\n",e, fi_n);
+	printf("\nd = %ld\tn = %ld\n",d, n);
+
+	if (int(d) < 0)
+		*tmp_d = 0;
+
+	fp2 = fopen(public_key_fl, "wb");
+
+	fwrite(&n, sizeof(size_t), 1, fp2);
+	fwrite(&d, sizeof(size_t), 1, fp2);
+	fclose(fp2);
+
+	fp1 = fopen(private_key_fl, "wb");
+
+	fwrite(&n, sizeof(size_t), 1, fp1);
+	fwrite(&d, sizeof(size_t), 1, fp1);
+	fclose(fp1);
 }
 
 
