@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "rsa.h"
 #include "utils.h"
 
@@ -14,8 +9,7 @@
  *
  * Decrypts the input file and stores the plaintext to the output file
  */
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int opt;			/* used for command line arguments */
 	int op_mode;			/* operation mode                  */
@@ -66,7 +60,6 @@ main(int argc, char **argv)
 	/* check arguments */
 	check_args(input_file, output_file, key_file, op_mode);
 
-
 	/* serve each mode... */
 	switch (op_mode) {
 	case 0:
@@ -76,7 +69,14 @@ main(int argc, char **argv)
 		rsa_encrypt(input_file, output_file, key_file);
 		break;
 	case 2:
+		tmp_d = 1;
 		rsa_keygen();
+
+		while(tmp_d == 1)
+		{
+			tmp_d = 1;
+			rsa_keygen();
+		}
 		break;
 	default:
 		break;

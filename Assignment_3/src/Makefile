@@ -1,7 +1,7 @@
 CC = gcc
 DBUG = -g
 CCFLAGS = -O2 -Wall -pedantic
-OBJFILES = main.o rsa.o utils.o
+OBJFILES = main.o rsa.o -lm utils.o
 
 TARGET = assign_3
 

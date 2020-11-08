@@ -12,27 +12,44 @@
  */
 size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 {
-	size_t* primes;
-	size_t *prime = malloc((sizeof(size_t)*limit)+1);
+	// size_t* primes;
+	size_t *prime = malloc((limit+1)*sizeof(size_t));
 	size_t i,j,k=2;
+	int tmp = 0;
 	/* TODO */	
 
-	for(i = 2; i <= limit; i ++)
+	for(i = 0; i <= limit; i++)
 		prime[i] = i;
 
-	for(i = 2; i*i <= limit; i ++)
-		for(j = i*i; j <= limit; j += i)
-			prime[j] = 0;
-
-	for(i = 2; i <= limit; i ++)
+	for(i = 2; i < limit; i++)
 	{
-		for (k=0; k < limit; k++)
+		if(prime[i] != 0)
 		{
-			if(prime[i] != 0)
+			for(j = 2; j < limit; j++)
 			{
-				printf("%d ",(int)prime[i]);
-				primes[k] = prime[i];
+				prime[j*prime[i]] = 0;
+
+				if(prime[i] * j > limit)
+					break;
 			}
+		}			
+	}
+	
+	for (i = 0; i < limit; i++)
+	{
+		if(prime[i]  != 0)
+			tmp++; //use as a counter
+	}
+
+	size_t *primes = malloc(tmp*sizeof(size_t));
+	tmp = 0;
+
+	for(i = 0; i < limit; i++)
+	{
+		if(prime[i] != 0)
+		{
+			primes[tmp] = prime[i];
+			tmp++;
 		}
 	}
 
@@ -92,6 +109,7 @@ size_t choose_e(size_t* fi_n, size_t* n)
 {
 	size_t e, fi;
 	/* TODO */
+	srand(time(NULL));
 	size_t *prime = sieve_of_eratosthenes(RSA_SIEVE_LIMIT, NULL); //might delete the second arg later
 
 	while(1)
@@ -105,7 +123,7 @@ size_t choose_e(size_t* fi_n, size_t* n)
 
 		fi = calc_fi_n(p ,q);
 
-		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123)
+		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123 && (e*mod_inverse(e,fi))%fi==1)
 		{
 			*fi_n = fi;
 			*n = compute_n(p,q);
@@ -177,11 +195,18 @@ void rsa_keygen(void)
 	char* public_key_fl = "public.key";
 	FILE* fp1, *fp2;
 
-	printf("e = %ld\tf(n) = %ld\n",e, fi_n);
-	printf("\nd = %ld\tn = %ld\n",d, n);
-
 	if ((int)d < 0)
+	{
 		tmp_d = 0;
+		printf("e = %ld\tf(n) = %ld\n",e, fi_n);
+		printf("\nd = %d\tn = %ld\n",tmp_d, n);
+	}
+
+	else
+	{
+		printf("e = %ld\tf(n) = %ld\n",e, fi_n);
+		printf("\nd = %ld\tn = %ld\n",d, n);
+	}
 
 	fp2 = fopen(public_key_fl, "wb");
 
@@ -209,10 +234,71 @@ void rsa_encrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
+	size_t n, e, i = 0;\
+	size_t* ciphertext;
+	unsigned char* plaintext;
+	long int numOfBytes;
+
+	FILE* fp = fopen(input_file, "rb");
+	FILE* key = fopen(key_file, "rb");
+
+	if(fp == NULL || key == NULL)
+	{
+		fprintf(stderr, "Error");
+		exit(EXIT_FAILURE);
+	}
+
+	fseek(fp, 0L, SEEK_END);
+	numOfBytes = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+
+	ciphertext = malloc(sizeof(char)*(numOfBytes));
+	plaintext = malloc(sizeof(char)*(numOfBytes));;
+
+	fread(&n, sizeof(size_t), 1, key);
+   	fread(&e, sizeof(size_t), 1, key);
+	
+	size_t pl_lgth = fread(plaintext, sizeof(char), numOfBytes, fp);
+
+	for(; i < pl_lgth; i++)
+	{
+		ciphertext[i] = modExp(plaintext[i], (long)(long)e, (long)(long)n);
+	}
+
+	FILE* output = fopen(output_file, "wb");
+	fwrite(ciphertext, 8, numOfBytes, output);
+
+	fclose(output);
+	fclose(fp);
+
 
 }
 
+long long modExp(long long a, long long b, long long c)
+{
+	if(a < 0 || b < 0 || c <= 0)
+	{
+		exit(EXIT_FAILURE);
+	}
 
+	a = a % c;
+
+	if(b == 0)
+		return 1;
+
+	if(b ==1)
+		return a;
+
+	if(b % 2 == 0)
+	{
+		return(modExp(pow(a,2), b / 2, c) % c);
+	}
+
+	if(b % 2 == 1)
+	{
+		return(a * modExp(a, b-1, c) % c);
+	}
+}
 /*
  * Decrypts an input file and dumps the plaintext into an output file
  *
@@ -225,5 +311,38 @@ void rsa_decrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
+	size_t n, e;
+	size_t i = 0;
+	long int numOfBytes;
+	FILE* fp = fopen(input_file, "rb");
+	FILE* key = fopen(key_file, "rb");
 
+	if(fp == NULL || key == NULL)
+	{
+		fprintf(stderr, "Error");
+		exit(EXIT_FAILURE);
+	}
+
+	fseek(fp, 0L, SEEK_END);
+	numOfBytes = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+
+	size_t* ciphertext = malloc(sizeof(size_t) * (numOfBytes));
+	char* plaintext = malloc(sizeof(char) * numOfBytes);
+
+	fread(&n, sizeof(size_t), 1, key);
+   	fread(&e, sizeof(size_t), 1, key);
+	
+	size_t cipher_lgth = fread(ciphertext, sizeof(size_t), numOfBytes, fp);
+
+	for(; i < cipher_lgth; i++)
+	{
+		ciphertext[i] = modExp(ciphertext[i], (long)(long)e, (long)(long)n);
+	}
+
+	FILE* output = fopen(output_file, "wb");
+	fwrite(ciphertext, sizeof(char), cipher_lgth, output);
+
+	fclose(output);
+	fclose(fp);
 }

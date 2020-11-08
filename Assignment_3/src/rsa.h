@@ -7,6 +7,8 @@
 #include <time.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
+#include <time.h>
 
 # define RSA_SIEVE_LIMIT 255
 
@@ -89,5 +91,7 @@ size_t compute_n(size_t , size_t );
 size_t calc_fi_n(size_t , size_t );
 
 size_t gcdExtended(size_t , size_t , size_t* , size_t* );
+
+long long modExp(long long a, long long b, long long c);
 
 #endif /* _RSA_H */
