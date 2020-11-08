@@ -115,7 +115,27 @@ size_t choose_e(size_t fi_n)
 
 }
 
+// extra function No.3
 
+size_t gcdExtended(int a, int b, int* x, int* y) //geeks for geeks found 
+{ 
+    // Base Case 
+    if (a == 0) { 
+        *x = 0; 
+        *y = 1; 
+        return b; 
+    } 
+  
+    int x1, y1; // To store results of recursive call 
+    int gcd = gcdExtended(b % a, a, &x1, &y1); 
+  
+    // Update x and y using results of recursive 
+    // call 
+    *x = y1 - (b / a) * x1; 
+    *y = x1; 
+  
+    return gcd; 
+} 
 /*
  * Calculates the modular inverse
  *
@@ -125,11 +145,18 @@ size_t choose_e(size_t fi_n)
  * ret: modular inverse
  */
 size_t
-mod_inverse(size_t a, size_t b)
+mod_inverse(size_t e, size_t fi) // changed var names from a,b to e,fi respectively
 {
 
 	/* TODO */
+	size_t x, y, g = gcdextended(a, b, b&x, &y);
 
+	if(g != 1)
+		return -1;
+	if ((a*x) % b == 1)
+		return x;
+	if ((a*y) % b == 1)
+		return y;
 }
 
 
