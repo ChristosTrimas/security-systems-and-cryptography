@@ -254,7 +254,6 @@ int verify_cmac(unsigned char *cmac1, unsigned char *cmac2)
 		return 0;
 	}
 
-	
 	return 1;
 }
 

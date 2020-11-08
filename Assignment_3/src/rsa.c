@@ -10,13 +10,32 @@
  *
  * ret:  The prime numbers that are less or equal to the limit
  */
-size_t *
-sieve_of_eratosthenes(int limit, int *primes_sz)
+size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 {
-	size_t *primes;
-
+	size_t primes[];
+	size_t *prime = malloc(sizeof((size_t)*limit)+1);
+	size_t i,j,k=2;
 	/* TODO */	
 
+	for(i = 2; i <= n; i ++)
+		prime[i] = i;
+
+	for(i = 2; i*i <= n; i ++)
+		for(j = i*i; j <= n; j += i)
+			prime[j] = 0;
+
+	for(i = 2; i <= n; i ++)
+	{
+		for (k=0; k < limit; k++)
+		{
+			if(prime[i] != 0)
+			{
+				printf("%d ",prime[i]);
+				primes[k] = prime[i];
+			}
+		}
+	}
+	
 	return primes;
 }
 
