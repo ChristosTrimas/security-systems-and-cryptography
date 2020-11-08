@@ -56,13 +56,27 @@ int gcd(int a, int b)
 
 	while(a != 0)
 	{
-		tmp =a;
+		tmp = a;
 		a = b % a;
 		b = tmp;
 	}
 
 	return b;
 
+}
+
+// extra function No.1
+
+size_t compute_n(size_t p, size_t q)
+{
+	return p * q;
+}
+
+// extra function No.2
+
+size_t calc_fi_n(size_t p, size_t q)
+{
+	return (p-1)*(q-1);
 }
 
 
@@ -74,14 +88,31 @@ int gcd(int a, int b)
  *
  * ret: 'e'
  */
-size_t
-choose_e(size_t fi_n)
+size_t choose_e(size_t fi_n)
 {
-	size_t e;
-
+	size_t e, fi, n;
 	/* TODO */
+	size_t *prime = sieve_of_eratosthenes(RSA_SIEVE_LIMIT, NULL); //might delete the second arg later
 
-	return e;
+	while(1)
+	{
+		e = prime[rand()%sizeof(prime)];
+		size_t p = prime[rand()%sizeof(prime)];
+		size_t q = prime[rand()%sizeof(prime)];
+
+		if(p == 1 || q == 1)
+			continue;
+
+		fi = calc_fi_n(p ,q);
+
+		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123)
+		{
+			fi_n = fi;
+			n = compute_n(p,q)
+			return e;
+		}
+	}
+
 }
 
 
