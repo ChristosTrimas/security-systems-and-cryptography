@@ -123,22 +123,22 @@ size_t choose_e(size_t* fi_n, size_t* n)
 
 		fi = calc_fi_n(p ,q);
 
-		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123 && (e*mod_inverse(e,fi))%fi==1)
+		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123 )
 		{
 			*fi_n = fi;
 			*n = compute_n(p,q);
 			return e;
 		}
 	}
-
 }
 
 // extra function No.3
 
-size_t gcdExtended(size_t a, size_t b, size_t* x, size_t* y) //geeks for geeks found 
+size_t gcdExtended(size_t a, size_t b, size_t* x, size_t* y) 
 { 
     // Base Case 
-    if (a == 0) { 
+    if (a == 0) 
+    { 
         *x = 0; 
         *y = 1; 
         return b; 
@@ -170,8 +170,10 @@ size_t mod_inverse(size_t e, size_t fi) // changed var names from a,b to e,fi re
 
 	if(g != 1)
 		return -1;
+
 	if ((e*x) % fi == 1)
 		return x;
+	
 	if ((e*y) % fi == 1)
 		return y;
 }
@@ -210,14 +212,14 @@ void rsa_keygen(void)
 
 	fp2 = fopen(public_key_fl, "wb");
 
-	fwrite(&n, sizeof(size_t), 1, fp2);
-	fwrite(&d, sizeof(size_t), 1, fp2);
+	fwrite(&n, sizeof(size_t), PLAIN_SIZE, fp2);
+	fwrite(&d, sizeof(size_t), PLAIN_SIZE, fp2);
 	fclose(fp2);
 
 	fp1 = fopen(private_key_fl, "wb");
 
-	fwrite(&n, sizeof(size_t), 1, fp1);
-	fwrite(&d, sizeof(size_t), 1, fp1);
+	fwrite(&n, sizeof(size_t), PLAIN_SIZE, fp1);
+	fwrite(&d, sizeof(size_t), PLAIN_SIZE, fp1);
 	fclose(fp1);
 }
 
@@ -234,10 +236,9 @@ void rsa_encrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
-	size_t n, e, i = 0;\
 	size_t* ciphertext;
-	unsigned char* plaintext;
-	long int numOfBytes;
+	char* plaintext;
+	size_t n, e, i = 0;
 
 	FILE* fp = fopen(input_file, "rb");
 	FILE* key = fopen(key_file, "rb");
@@ -248,33 +249,35 @@ void rsa_encrypt(char *input_file, char *output_file, char *key_file)
 		exit(EXIT_FAILURE);
 	}
 
-	fseek(fp, 0L, SEEK_END);
-	numOfBytes = ftell(fp);
-	fseek(fp, 0L, SEEK_SET);
+	// from assignment No.2
+	fseek(fp, 0, SEEK_END);
+	long int numOfBytes = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
-	ciphertext = malloc(sizeof(char)*(numOfBytes));
-	plaintext = malloc(sizeof(char)*(numOfBytes));;
+	plaintext = malloc(numOfBytes);
+	ciphertext = malloc(numOfBytes);
 
-	fread(&n, sizeof(size_t), 1, key);
-   	fread(&e, sizeof(size_t), 1, key);
-	
-	size_t pl_lgth = fread(plaintext, sizeof(char), numOfBytes, fp);
+	fread(&n, sizeof(size_t), PLAIN_SIZE, key);
+   	fread(&e, sizeof(size_t), PLAIN_SIZE, key);
+
+	size_t pl_lgth = fread(plaintext, PLAIN_SIZE, numOfBytes, fp);
 
 	for(; i < pl_lgth; i++)
 	{
-		ciphertext[i] = modExp(plaintext[i], (long)(long)e, (long)(long)n);
+		ciphertext[i] = modExp(plaintext[i], e, n);
+		// printf("%ld\n",ciphertext[i]);
 	}
 
 	FILE* output = fopen(output_file, "wb");
-	fwrite(ciphertext, 8, numOfBytes, output);
+	fwrite(ciphertext, CIPHER_SIZE, numOfBytes, output);
 
 	fclose(output);
 	fclose(fp);
-
-
 }
 
-long long modExp(long long a, long long b, long long c)
+// extra function No.4
+
+unsigned long modExp(unsigned long a, unsigned long b, unsigned long c)
 {
 	if(a < 0 || b < 0 || c <= 0)
 	{
@@ -291,7 +294,7 @@ long long modExp(long long a, long long b, long long c)
 
 	if(b % 2 == 0)
 	{
-		return(modExp(pow(a,2), b / 2, c) % c);
+		return(modExp(a*a % c, b / 2, c) % c);
 	}
 
 	if(b % 2 == 1)
@@ -311,9 +314,10 @@ void rsa_decrypt(char *input_file, char *output_file, char *key_file)
 {
 
 	/* TODO */
-	size_t n, e;
-	size_t i = 0;
-	long int numOfBytes;
+	size_t* ciphertext;
+	char* plaintext;
+	size_t n, e, i = 0;
+
 	FILE* fp = fopen(input_file, "rb");
 	FILE* key = fopen(key_file, "rb");
 
@@ -323,25 +327,28 @@ void rsa_decrypt(char *input_file, char *output_file, char *key_file)
 		exit(EXIT_FAILURE);
 	}
 
-	fseek(fp, 0L, SEEK_END);
-	numOfBytes = ftell(fp);
-	fseek(fp, 0L, SEEK_SET);
+	// from assignment No.2
+	fseek(fp, 0, SEEK_END);
+	long int numOfBytes = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
-	size_t* ciphertext = malloc(sizeof(size_t) * (numOfBytes));
-	char* plaintext = malloc(sizeof(char) * numOfBytes);
-
-	fread(&n, sizeof(size_t), 1, key);
-   	fread(&e, sizeof(size_t), 1, key);
+	ciphertext = malloc(sizeof(size_t) * numOfBytes);
 	
-	size_t cipher_lgth = fread(ciphertext, sizeof(size_t), numOfBytes, fp);
+	fread(&n, sizeof(size_t), PLAIN_SIZE, key);
+   	fread(&e, sizeof(size_t), PLAIN_SIZE, key);
+   	
+	size_t cphr_lgth = fread(ciphertext, sizeof(size_t), numOfBytes, fp);
+	plaintext = malloc(cphr_lgth);
 
-	for(; i < cipher_lgth; i++)
+
+	for(; i < cphr_lgth; i++)
 	{
-		ciphertext[i] = modExp(ciphertext[i], (long)(long)e, (long)(long)n);
+		plaintext[i] = modExp(ciphertext[i], e, n);
+		// printf("%ld\n",ciphertext[i]);
 	}
 
 	FILE* output = fopen(output_file, "wb");
-	fwrite(ciphertext, sizeof(char), cipher_lgth, output);
+	fwrite(plaintext, PLAIN_SIZE, cphr_lgth, output);
 
 	fclose(output);
 	fclose(fp);

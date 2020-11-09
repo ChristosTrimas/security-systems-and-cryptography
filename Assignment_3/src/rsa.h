@@ -10,7 +10,9 @@
 #include <math.h>
 #include <time.h>
 
-# define RSA_SIEVE_LIMIT 255
+#define RSA_SIEVE_LIMIT 255
+#define CIPHER_SIZE 8
+#define PLAIN_SIZE 1
 
 int tmp_d; //if we have negative d, we can not use it in RSA
 
@@ -92,6 +94,6 @@ size_t calc_fi_n(size_t , size_t );
 
 size_t gcdExtended(size_t , size_t , size_t* , size_t* );
 
-long long modExp(long long a, long long b, long long c);
+unsigned long modExp(unsigned long , unsigned long , unsigned long );
 
 #endif /* _RSA_H */
