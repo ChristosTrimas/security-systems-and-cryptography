@@ -69,14 +69,7 @@ int main(int argc, char **argv)
 		rsa_encrypt(input_file, output_file, key_file);
 		break;
 	case 2:
-		tmp_d = 1;
 		rsa_keygen();
-
-		while(tmp_d == 1)
-		{
-			tmp_d = 1;
-			rsa_keygen();
-		}
 		break;
 	default:
 		break;
