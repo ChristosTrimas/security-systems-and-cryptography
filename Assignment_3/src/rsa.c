@@ -10,42 +10,36 @@
  *
  * ret:  The prime numbers that are less or equal to the limit
  */
+
 size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 {
 	// size_t* primes;
-	size_t *prime = malloc((limit+1)*sizeof(size_t));
+ 	size_t *prime = malloc((limit+1)*sizeof(size_t));
 	size_t i,j,k=2;
-	int tmp = 0;
+	int tmp;
 	/* TODO */	
 
-	for(i = 0; i <= limit; i++)
+	for(i = 2; i <= limit; i ++)
 		prime[i] = i;
 
-	for(i = 2; i < limit; i++)
+	for(i = 2; i*i <= limit; i ++)
 	{
-		if(prime[i] != 0)
-		{
-			for(j = 2; j < limit; j++)
-			{
-				prime[j*prime[i]] = 0;
-
-				if(prime[i] * j > limit)
-					break;
-			}
-		}			
-	}
-	
+		for(j = i*i; j <= limit; j += i)
+			prime[j] = 0;
+	}	
+		
 	for (i = 0; i < limit; i++)
 	{
 		if(prime[i]  != 0)
-			tmp++; //use as a counter
+		tmp++; //use as a counter
 	}
 
 	size_t *primes = malloc(tmp*sizeof(size_t));
 	tmp = 0;
 
-	for(i = 0; i < limit; i++)
+	for(i = 2; i <= limit; i ++)
 	{
+		
 		if(prime[i] != 0)
 		{
 			primes[tmp] = prime[i];
@@ -55,7 +49,6 @@ size_t* sieve_of_eratosthenes(int limit, int *primes_sz)
 
 	return primes;
 }
-
 
 /*
  * Greatest Common Denominator
@@ -123,7 +116,7 @@ size_t choose_e(size_t* fi_n, size_t* n)
 
 		fi = calc_fi_n(p ,q);
 
-		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0 && compute_n(p,q) > 123 )
+		if( 1 < e && e < fi && gcd(e, fi) == 1 && e%fi != 0  )
 		{
 			*fi_n = fi;
 			*n = compute_n(p,q);
@@ -201,13 +194,13 @@ void rsa_keygen(void)
 	{
 		tmp_d = 0;
 		printf("e = %ld\tf(n) = %ld\n",e, fi_n);
-		printf("\nd = %d\tn = %ld\n",tmp_d, n);
+		printf("d = %d\tn = %ld\n",tmp_d, n);
 	}
 
 	else
 	{
 		printf("e = %ld\tf(n) = %ld\n",e, fi_n);
-		printf("\nd = %ld\tn = %ld\n",d, n);
+		printf("d = %ld\tn = %ld\n",d, n);
 	}
 
 	fp2 = fopen(public_key_fl, "wb");
