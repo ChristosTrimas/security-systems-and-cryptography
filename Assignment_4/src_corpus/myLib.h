@@ -32,6 +32,6 @@ void log_entry(const char*, unsigned const char );
 * Is action denied flag, File fingerprint 							  *
 ***********************************************************************/
 
-void flog_entry(FILE* , unsigned const char );
+void wlog_entry(FILE* , unsigned const char );
 
 #endif

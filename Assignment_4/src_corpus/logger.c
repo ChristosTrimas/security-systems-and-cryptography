@@ -4,7 +4,7 @@
 
 void log_entry(const char* path, unsigned const char accessible)
 {
-	FILE* (*_fopen)(const char*, const char*);
+	FILE* (*original_fopen)(const char*, const char*);
 	FILE* fp;
 
 	char ttime[80], tdate[80], abspath[1024], logbuff[1024];
@@ -20,7 +20,7 @@ void log_entry(const char* path, unsigned const char accessible)
 	int md5count;
 	MD5_CTX md_ctx;
 
-	_fopen = dlsym(RTLD_NEXT, "fopen");
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
 
 	//get the full path
 	realpath(path, abspath);
@@ -42,7 +42,7 @@ void log_entry(const char* path, unsigned const char accessible)
 	sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\topen\taction_denied\thash\n");
 	sprintf(logbuff + strlen(logbuff), "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, -1 * stat(abspath, &statinfo));
 
-	lp = _fopen(abspath, "rb");
+	lp = original_fopen(abspath, "rb");
 
 	if(lp)
 	{
@@ -69,7 +69,7 @@ void log_entry(const char* path, unsigned const char accessible)
 
 	sprintf(logbuff + strlen(logbuff), "\n");
 
-	fp = _fopen("log.txt", "a");
+	fp = original_fopen("log.txt", "a");
 
 	if(!fp)
 	{
@@ -82,16 +82,25 @@ void log_entry(const char* path, unsigned const char accessible)
 
 }
 
+void wlog_entry(FILE* tmp, unsigned const char accessible)
+{
+	char path[1024], proc[1024];
+	ssize_t size;
 
+	sprintf(proc, "/proc/self/fd/%d",fileno(tmp));
+	size = readlink(proc, path, 1024);
+	path[size] = '\0';
 
-
-
+	log_entry(path, accessible);
+}
 
 FILE* fopen(const char *path, const char *mode) 
 {
 
 	FILE *original_fopen_ret;
 	FILE *(*original_fopen)(const char*, const char*);
+
+	log_entry(path,1);
 
 	/* call the original fopen function */
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
@@ -110,6 +119,10 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	/* call the original fwrite function */
 	original_fwrite = dlsym(RTLD_NEXT, "fwrite");
 	original_fwrite_ret = (*original_fwrite)(ptr, size, nmemb, stream);
+
+	fflush(stream);
+
+	wlog_entry(stream,0);
 
 	return original_fwrite_ret;
 }
