@@ -39,7 +39,7 @@ void log_entry(const char* path, unsigned const char accessible)
 		sprintf(logbuff + strlen(logbuff), "\t");
 	}
 
-	sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\topen\taction_denied\thash\n");
+	sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\taccess\taction_denied\thash\n");
 	sprintf(logbuff + strlen(logbuff), "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, -1 * stat(abspath, &statinfo));
 
 	lp = original_fopen(abspath, "rb");
@@ -100,7 +100,12 @@ FILE* fopen(const char *path, const char *mode)
 	FILE *original_fopen_ret;
 	FILE *(*original_fopen)(const char*, const char*);
 
-	log_entry(path,1);
+	if(*mode == 119)
+	{
+		log_entry(path, 0);
+	}
+	else
+		log_entry(path, 1);
 
 	/* call the original fopen function */
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
@@ -108,7 +113,6 @@ FILE* fopen(const char *path, const char *mode)
 
 	return original_fopen_ret;
 }
-
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) 
 {
@@ -122,7 +126,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 	fflush(stream);
 
-	wlog_entry(stream,0);
+	wlog_entry(stream,2);
 
 	return original_fwrite_ret;
 }

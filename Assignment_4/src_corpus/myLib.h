@@ -29,7 +29,7 @@ void log_entry(const char*, unsigned const char );
 /**********************************************************************
 * This function creates and stores all the necessary information for  *
 * each log entry. UID, File_name, Date, Timestamp, Access type,       *
-* Is action denied flag, File fingerprint 							  *
+* Is action denied flag, File fingerprint. Used for fwrite.			  *
 ***********************************************************************/
 
 void wlog_entry(FILE* , unsigned const char );

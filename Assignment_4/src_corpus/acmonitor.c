@@ -70,9 +70,7 @@ list_file_modifications(FILE *log, char *file_to_scan)
 
 }
 
-
-int 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 
 	int ch;
