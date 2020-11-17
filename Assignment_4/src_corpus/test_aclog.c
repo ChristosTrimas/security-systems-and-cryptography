@@ -15,9 +15,9 @@ int main()
 
 	/* example source code */
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 11; i++) {
 
-		file = fopen(filenames[i], "w+");
+		file = fopen(filenames[i], "r");
 		if (file == NULL) 
 			printf("fopen error\n");
 		else {

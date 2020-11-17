@@ -9,7 +9,7 @@ void log_entry(const char* path, unsigned const char accessible)
 
 	char ttime[80], tdate[80], abspath[1024], logbuff[1024];
 
-	struct stat statinfo;
+	// struct stat statinfo;
 	struct tm* timeInfo;
 	time_t pure_time;
 
@@ -40,7 +40,7 @@ void log_entry(const char* path, unsigned const char accessible)
 	}
 
 	sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\taccess\taction_denied\thash\n");
-	sprintf(logbuff + strlen(logbuff), "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, -1 * stat(abspath, &statinfo));
+	sprintf(logbuff + strlen(logbuff), "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, action_access);
 
 	lp = original_fopen(abspath, "rb");
 
@@ -100,6 +100,15 @@ FILE* fopen(const char *path, const char *mode)
 	FILE *original_fopen_ret;
 	FILE *(*original_fopen)(const char*, const char*);
 
+	/* call the original fopen function */
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
+	FILE *buff_access = original_fopen(path, mode);
+
+	if(!buff_access)
+	{
+		action_access = 1;
+	}
+
 	if(*mode == 119)
 	{
 		log_entry(path, 0);
@@ -107,8 +116,6 @@ FILE* fopen(const char *path, const char *mode)
 	else
 		log_entry(path, 1);
 
-	/* call the original fopen function */
-	original_fopen = dlsym(RTLD_NEXT, "fopen");
 	original_fopen_ret = (*original_fopen)(path, mode);
 
 	return original_fopen_ret;

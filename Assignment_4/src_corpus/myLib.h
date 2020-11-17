@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <openssl/md5.h>
 
+
+int action_access; // a variable to control the access of a file.
 // the fopen and fwrite functions of the logger.c file
 
 FILE* fopen(const char *, const char *);
