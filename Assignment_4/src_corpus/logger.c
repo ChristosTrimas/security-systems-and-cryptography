@@ -8,8 +8,6 @@ void log_entry(const char* path, unsigned const char accessible)
 	FILE* fp;
 
 	char ttime[80], tdate[80], abspath[1024], logbuff[1024];
-
-	// struct stat statinfo;
 	struct tm* timeInfo;
 	time_t pure_time;
 
@@ -77,8 +75,10 @@ void log_entry(const char* path, unsigned const char accessible)
 		return;
 	}
 
+	action_access = 0;
 	fputs(logbuff, fp);
 	fclose(fp);	
+	return;
 
 }
 
@@ -94,6 +94,55 @@ void wlog_entry(FILE* tmp, unsigned const char accessible)
 	log_entry(path, accessible);
 }
 
+void noLog(const char* path, unsigned const char accessible)
+{
+	FILE* (*original_fopen)(const char*, const char*);
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
+
+	char ttime[80], tdate[80], logbuff[1024],abspath[1024];
+	struct tm* timeInfo;
+	time_t pure_time;
+	int i=0;
+
+	FILE* fd = original_fopen("./log.txt","a");
+	FILE* lp;
+	realpath(path, abspath);
+	time(&pure_time);
+	timeInfo = localtime(&pure_time);
+
+	strftime(ttime, 80, "%T", timeInfo);
+	strftime(tdate, 80, "%F", timeInfo);
+
+	sprintf(logbuff, "UID\tfile_name");
+
+	for(; i < strlen(abspath)/8; i++)
+	{
+		sprintf(logbuff + strlen(logbuff), "\t");
+	}
+	sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\taccess\taction_denied\thash\n");
+	sprintf(logbuff + strlen(logbuff), "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, action_access);
+
+	lp = original_fopen(path, "rb");
+
+	// fill hash with zeros 
+	if(!lp)
+		for (; i < MD5_DIGEST_LENGTH; i++) 
+			sprintf(logbuff + strlen(logbuff), "%02x",0);
+
+	sprintf(logbuff + strlen(logbuff), "\n");
+
+	if(!fd)
+	{
+		sprintf(logbuff + strlen(logbuff), "log.txt could not be open.\n");
+		return;
+	}
+
+	action_access = 0;
+	fputs(logbuff, fd);
+	fclose(fd);
+	return;
+}
+
 FILE* fopen(const char *path, const char *mode) 
 {
 
@@ -102,19 +151,33 @@ FILE* fopen(const char *path, const char *mode)
 
 	/* call the original fopen function */
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
-	FILE *buff_access = original_fopen(path, mode);
+	FILE *my_file = original_fopen(path, mode);
 
-	if(!buff_access)
+	if(my_file == NULL)
 	{
-		action_access = 1;
+		// printf("errno = %d\n",errno);
+		if(errno == EACCES || errno == EPERM)
+		{
+			// printf("Error.\n");
+			action_access = 1;
+		}
+		if(*mode == 119)
+		{
+			noLog(path, 0);
+		}
+		else
+			noLog(path, 1);
 	}
 
-	if(*mode == 119)
+	else
+	{
+		if(*mode == 119)
 	{
 		log_entry(path, 0);
 	}
 	else
 		log_entry(path, 1);
+	}
 
 	original_fopen_ret = (*original_fopen)(path, mode);
 
@@ -137,5 +200,3 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 	return original_fwrite_ret;
 }
-
-

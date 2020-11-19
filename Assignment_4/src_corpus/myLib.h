@@ -1,17 +1,22 @@
 #ifndef MY_LIB_H
 #define MY_LIB_H
 
-#include <time.h>
 #include <stdio.h>
-#include <dlfcn.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
+#include <dlfcn.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
+#include <errno.h>
 #include <openssl/md5.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <fcntl.h>
 
 
-int action_access; // a variable to control the access of a file.
+int action_access = 0; // a variable to control the access of a file.
+
 // the fopen and fwrite functions of the logger.c file
 
 FILE* fopen(const char *, const char *);
@@ -35,5 +40,11 @@ void log_entry(const char*, unsigned const char );
 ***********************************************************************/
 
 void wlog_entry(FILE* , unsigned const char );
+
+/**********************************************************************
+* This function creates and stores all the necessary information for  *
+* each log entry that the user has no access.					      * 							  *
+***********************************************************************/
+void noLog(const char* , unsigned const char );
 
 #endif
