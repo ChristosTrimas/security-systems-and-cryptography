@@ -1,12 +1,10 @@
-#include <stdio.h>
-#include <string.h>
 #include "myLib.h"
 
 int main() 
 {
 	int i;
 	size_t bytes;
-	FILE *file;
+	FILE *file ;
 
 	// fclose(file);
 	char filenames[10][7] = {"file_0", "file_1", 
@@ -17,11 +15,11 @@ int main()
 
 	/* example source code */
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 1; i++) {
 
-		file = fopen(filenames[i], "r");
+		file = fopen(filenames[i], "w+");
 		// if (file == NULL) 
-		// 	printf("fopen error\n");
+		// 	continue;
 		// else {
 		// 	bytes = fwrite("Christos trimas", 50, 1, file);
 		// 	fclose(file);
