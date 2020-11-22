@@ -10,8 +10,7 @@ void log_entry(const char* path, unsigned const char accessible)
 	char ttime[80], tdate[80], abspath[1024], logbuff[2048];
 	struct tm* timeInfo;
 	time_t pure_time;
-
-	// unsigned long i = 0;
+	
 	FILE* lp;
 	char buffer[1024];
 	unsigned char hash[MD5_DIGEST_LENGTH];
@@ -31,13 +30,6 @@ void log_entry(const char* path, unsigned const char accessible)
 	strftime(tdate, 80, "%F", timeInfo);
 
 	sprintf(logbuff, "\t");
-
-	// for(; i < strlen(abspath)/8; i++)
-	// {
-	// 	sprintf(logbuff + strlen(logbuff), "\t");
-	// }
-
-	// sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\taccess\taction_denied\thash\n");
 	sprintf(logbuff, "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, action_access);
 
 	lp = original_fopen(abspath, "rb");
@@ -110,12 +102,6 @@ void noLog(const char* path, unsigned const char accessible)
 	strftime(tdate, 80, "%F", timeInfo);
 
 	sprintf(logbuff, "\t");
-
-	// for(; i < strlen(abspath)/8; i++)
-	// {
-	// 	sprintf(logbuff + strlen(logbuff), "\t");
-	// }
-	// sprintf(logbuff + strlen(logbuff), "date\t\ttime\t\taccess\taction_denied\thash\n");
 	sprintf(logbuff, "%d\t%s\t%s\t%s\t%d\t%d\t\t",(unsigned int)getuid(), abspath, tdate, ttime, accessible, action_access);
 
 	lp = original_fopen(path, "rb");

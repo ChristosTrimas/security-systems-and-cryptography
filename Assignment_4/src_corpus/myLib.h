@@ -14,32 +14,6 @@
 #include <stdarg.h>
 #include <fcntl.h>
 
-
-// acmonitor.c functions and structures
-// typedef struct entry {
-
-// 	int uid; /* user id (positive integer) */
-// 	int access_type; /* access type values [0-2] */
-// 	int action_denied; /* is action denied values [0-1] */
-// 	int tmp;
-
-// 	time_t date; /* file access date */
-// 	time_t time; /* file access time */
-
-// 	char *file; /* filename (string) */
-// 	char *fingerprint; /* file fingerprint */
-
-// 	struct entry* next;
-// }entry_t;
-
-void usage(void);
-
-
-void initLog(void);
-// void  list_unauthorized_accesses(FILE*);
-
-// void list_file_modifications(FILE*, char*);
-
 int action_access = 0; // a variable to control the access of a file.
 
 // the fopen and fwrite functions of the logger.c file
@@ -68,10 +42,8 @@ void wlog_entry(FILE* , unsigned const char );
 
 /**********************************************************************
 * This function creates and stores all the necessary information for  *
-* each log entry that the user has no access.					      * 							  *
+* each log entry that the user has no access.					      * 							  
 ***********************************************************************/
 void noLog(const char* , unsigned const char );
-
-// entry_t* insert(entry_t* , int );
 
 #endif

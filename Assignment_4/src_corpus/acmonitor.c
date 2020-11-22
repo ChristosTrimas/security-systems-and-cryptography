@@ -5,39 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-struct entry {
-
-	char* id; /* user id (positive integer) */
-	char* access_type; /* access type values [0-2] */
-	char action_denied; /* is action denied values [0-1] */
-
-	char* date; /* file access date */
-	char* time; /* file access time */
-
-	char *file; /* filename (string) */
-	char *fingerprint; /* file fingerprint */
-
-	struct entry* next;
-};
-
-struct usersActivity{
-	char* id;
-	int count;
-	struct filesAccessed *head;
-
-	struct usersActivity* next;
-};
-
-struct filesAccessed{
-	char* filename;
-	struct filesAccessed* next;
-};
-
-struct entry* UserList;
-struct filesAccessed* activityList;
-
-void
-usage(void)
+void usage(void)
 {
 	printf(
 	       "\n"
@@ -53,136 +21,148 @@ usage(void)
 	exit(1);
 }
 
-void insertUser(struct entry** userList, char* id, char* filename, char* date, char* time, char* access_type, int action_denied, char* hash)
+void list_unauthorized_accesses(FILE* log)
 {
-	struct entry* newNode = NULL;
-	struct entry* prev = *userList;
-	
-	newNode = malloc(sizeof(struct entry));
-	
-	if(newNode == NULL)
+	int count;
+	char* logName;
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char action;
+
+	// save everything in a stack, for second operation
+	while((read = getline(&line, &len, log)) != -1)
 	{
-		fprintf(stdout, "Failed to allocate memory.\n");
-		exit(0);
-	}
+		count = 0;
+		char* str[7];
+		char* element;
+		element = strtok(line, "\t");
+		int i = 0;
 
-	newNode->id = malloc(strlen(id) * sizeof(char));
-	strcpy(newNode->id, id);
-	
-	newNode->file = malloc(sizeof(char) * strlen(filename));
-	strcpy(newNode->file, filename);
-	
-	newNode->date = malloc(sizeof(char) * strlen(date));
-	strcpy(newNode->date, date);
-	
-	newNode->time = malloc(sizeof(char) * strlen(filename));
-	strcpy(newNode->time, time);
-	
-	newNode->access_type = malloc(sizeof(char) * strlen(access_type));
-	
-	strcpy(newNode->access_type, access_type);
-	
-	// newNode->action_denied = malloc(sizeof(char) * strlen(action_denied));
-	// strcpy(newNode->action_denied, action_denied);
-	newNode->action_denied = action_denied;
-	
-	newNode->fingerprint = malloc(sizeof(char) * strlen(hash));
-	strcpy(newNode->fingerprint, hash);
-	
-	newNode->next = *userList;
-	*userList = newNode;
-}
-
-void inserAct(struct usersActivity** useActList, char* id)
-{
-	struct usersActivity* newNode = NULL;
-
-	newNode = malloc(sizeof(struct usersActivity));
-
-	if(newNode == NULL)
-	{
-		fprintf(stderr, "Failed to allocate memory.\n");
-		exit(0);
-	}
-
-	strcpy(newNode->id, id);
-
-	newNode->head = NULL;
-	newNode->count = 1;
-	newNode->next = *useActList;
-	*useActList = newNode;
-}
-
-void insertFile(struct filesAccessed** fileList, char* filename)
-{
-	struct filesAccessed* newNode = NULL;
-
-	newNode = malloc(sizeof(struct filesAccessed));
-
-	if(newNode == NULL)
-	{
-		fprintf(stderr, "Failed to allocate memory.\n");
-		exit(0);
-	}
-
-	strcpy(newNode->filename, filename);
-
-	newNode->next = *fileList;
-	*fileList = newNode;
-}
-
-void printUser(struct entry* userList)
-{
-	while(userList != NULL)
-	{
-		printf("%s\t%s\t%s\t%s\t%s\t%c\t%s\n", userList->id, userList->file, userList->date, userList->time, userList->access_type, userList->action_denied, userList->fingerprint);
-		userList = userList->next;
-	}
-}
-
-void list_unauthorized_accesses(struct entry* UserList)
-{
-	struct entry* tmp = UserList;
-	int counter = 0;
-	printUser(tmp);
-	while(tmp != NULL && !(strcmp(tmp->id, tmp->next->id)))
-	{
-		// printf(" action denied%c\n", tmp->action_denied);
-		if(tmp->action_denied == '1' )
+		for(; i<7; i++)
 		{
-			counter++;
-			// printf("counter = %d\n", counter);
+			str[i] = element;
+			element = strtok(NULL, "\t");
 		}
-		if(counter == 7)
+		if((strcmp(str[5], "1")==0))
 		{
-			printf("User %s, is malicious.\n",tmp->id);
-			counter = 0;
+			count++;
+			size_t len2=0;
+			ssize_t read2;
+			char* str2[7];
+			char* line2 = NULL;
+			while((read2 = getline(&line2, &len2, log))!=-1)
+			{
+				char* element2;
+				element2 = strtok(line2,"\t");
+				int j = 0;
+				for(; j<7; j++)
+				{
+					str2[j] = element2;
+					element2 = strtok(NULL, "\t");
+				}
+
+				if((strcmp(str[0],str2[0])==0) && (strcmp(str2[5],"1")==0) && strcmp(str[1],str2[1])!=0)
+				{
+					count++;
+				}
+			}
+
+			if(count >= 7)
+			{
+				printf("User %s unseccesfully tried to open seven or more files.\n",str[0]);
+				break;
+			}
 		}
-		// printf("counter = %d\n", counter);
-		if(tmp->next == NULL)
-		{
-			break;
-		}else{
-			tmp = tmp->next;
-		}
-		// printf(" action denied%d\n", tmp->action_denied);
 	}
-
-	return;
 }
-
 
 void list_file_modifications(FILE *log, char *file_to_scan)
 {
 
-	/* add your code here */
-	/* ... */
-	/* ... */
-	/* ... */
-	/* ... */
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t read;
 
+	char given_path[1024];
+	realpath(file_to_scan, given_path);
+
+	char line_hashes[20];
+	char* prev_hash = NULL;
+	int i;
+	int access_counter = 0, counter = 0;
+	while((read = getline(&line, &len, log)) != -1)
+	{
+		char* element;
+		char* str[7];
+		element = strtok(line, "\t");
+		i = 0;
+
+		while( i < 7)
+		{
+			str[i] = element;
+			element = strtok(NULL, "\t");
+			i++;
+		}
+
+		if((strcmp(str[1], given_path)) == 0)
+		{
+			if((strcmp(str[4],"0") == 0) && (strcmp(str[5],"0") == 0))
+			{
+				access_counter++;
+			}
+
+			if(prev_hash != NULL)
+			{
+				if((strcmp(prev_hash, str[6])) != 0)
+				{
+					counter++;
+				}
+
+				else if((strcmp(str[4],"1")) == 0 && (strcmp(str[5],"0")) == 0)
+				{
+					access_counter++;
+				}
+			}
+
+			prev_hash = str[6];
+			char* line2 = NULL;
+			size_t len2 = 0;
+			ssize_t read2;
+			char* str2[7];
+
+			while((read2 = getline(&line2, &len2, log)) != -1)
+			{
+				char* element2;
+				element2 = strtok(line2,"\t");
+				int k = 0;
+
+				while(k < 7)
+				{
+					str2[k] = element2;
+					element2 = strtok(NULL,"\t");
+					k++;
+				}
+
+				if((strcmp(str2[1], given_path) == 0) && (strcmp(prev_hash,str2[6]) != 0))
+				{
+					if((strcmp(str2[3],"1")==0) && (strcmp(str2[5],"0")==0))
+					{
+						counter++;
+					}
+					prev_hash = str2[6];
+					break;
+				}
+				else if((strcmp(str2[1], given_path)==0) && (strcmp(prev_hash, str2[6])==0) && (strcmp(str2[5],"0")==0))
+				{
+					access_counter++;
+				}
+			}
+		}
+		printf("User with id:%s, accessed file: %d, and modified it: %d.\n", str[0], access_counter, counter);
+	}
+	
 	return;
-
 }
 
 int main(int argc, char *argv[])
@@ -196,8 +176,6 @@ int main(int argc, char *argv[])
 	char action;
 
 	FILE *log;
-	UserList = NULL;
-	activityList = NULL;
 	if (argc < 2)
 		usage();
 
@@ -207,42 +185,13 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	while(read = (getline(&line, &len, log)) != -1)
-	{
-		char* str[6];
-		char* pch;
-		pch = strtok(line, "\t");
-		int j = 0;
-
-		while(pch != NULL)
-		{
-			if(j == 5)
-			{
-				action = *pch;
-				j++;
-			}
-			else
-			{
-				str[j] = pch;
-				pch = strtok(NULL, "\t");
-				j++;
-			}
-		}
-
-		insertUser(&UserList,str[0],str[1],str[2],str[3],str[4],action,str[5]);
-		// printUser(UserList);
-		// printf("next\n");
-		// printf("%ld\n",read);
-	}
-	// printf("perasa\n");
-
 	while ((ch = getopt(argc, argv, "hi:m")) != -1) {
 		switch (ch) {		
 		case 'i':
-			list_file_modifications(log, optarg);
+			list_file_modifications(log, argv[2]);
 			break;
 		case 'm':
-			list_unauthorized_accesses(UserList);
+			list_unauthorized_accesses(log);
 			break;
 		default:
 			usage();
