@@ -17,4 +17,8 @@ clean:
 	rm -rf test_aclog
 	rm -rf acmonitor
 	rm file_logging.log
+	rm files
+	rm -rf decrypted/*
+	rmdir decrypted
+	sudo rm file_0 file_1 file_2 file_3 file_4 file_5 file_6 file_7 file_8 file_9
 
