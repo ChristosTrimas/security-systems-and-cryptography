@@ -27,10 +27,8 @@ then
     mkdir "decrypted"
 fi
 
-gcc file_creation.c -o files
-
 rm -rf decrypted/*
-./files $1
+./file $1
 for file in Userfiles/*
 do 
 	end=".encrypt"

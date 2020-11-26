@@ -5,13 +5,12 @@ void main(int argc, char *argv[])
 	int i = 0;
 	size_t bytes;
 	FILE *file;
-	int j = 0;
 
 	int X = atoi(argv[1]);
 
 	for(; i < X; i++)
 	{
-		char path[2048] = "";
+		char path[50] = "";
 		sprintf(path, "Userfiles/new_file_%d", i);
 		file = fopen(path, "w+");
 
@@ -22,7 +21,7 @@ void main(int argc, char *argv[])
 
 		else 
 		{
-			bytes = fwrite(path, strlen(path), 1, file);
+			bytes = fwrite("Christos", strlen("Christos"), 1, file);
 			fclose(file);
 		}
 	} 

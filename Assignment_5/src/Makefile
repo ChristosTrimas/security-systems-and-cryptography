@@ -1,4 +1,7 @@
-all: logger acmonitor test_aclog
+all: logger acmonitor test_aclog test
+
+test: file_creation.c
+	gcc file_creation.c -o file
 
 logger: logger.c
 	gcc -Wall -std=c99 -fPIC -shared -o logger.so logger.c -lcrypto -ldl 
@@ -11,13 +14,13 @@ test_aclog: test_aclog.c
 
 run: logger.so test_aclog
 	LD_PRELOAD=./logger.so ./test_aclog
-
+	
 clean:
 	rm -rf logger.so
 	rm -rf test_aclog
 	rm -rf acmonitor
 	rm file_logging.log
-	rm files
+	rm file
 	rm -rf decrypted/*
 	rmdir decrypted
 	sudo rm file_0 file_1 file_2 file_3 file_4 file_5 file_6 file_7 file_8 file_9
