@@ -13,49 +13,49 @@ int main()
 
 	for (i = 0; i < 10; i++) {
 
-		file = fopen(filenames[i], "w+");
-		if (file == NULL) 
-			printf("fopen error\n");
-		else {
-			bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
-			fclose(file);
-		}
+		file = fopen(filenames[i], "r");
+		// if (file == NULL) 
+		// 	printf("fopen error\n");
+		// else {
+		// 	bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
+		// 	fclose(file);
+		// }
 
 	}
 	
-	for (i = 0; i < 10; i++) {
+	// for (i = 0; i < 10; i++) {
 
-		chmod(filenames[i%5], S_ISUID);
-		file = fopen(filenames[i], "w");
+	// 	chmod(filenames[i%5], S_ISUID);
+	// 	file = fopen(filenames[i], "w");
 
-		if (file == NULL) 
-			printf("fopen error\n");
+	// 	if (file == NULL) 
+	// 		printf("fopen error\n");
 		
-		else 
-		{
-			bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
-			fclose(file);
-		}
+	// 	else 
+	// 	{
+	// 		bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
+	// 		fclose(file);
+	// 	}
 		
-		chmod(filenames[i], S_IRUSR);
-		file = fopen(filenames[i], "r");
+	// 	chmod(filenames[i], S_IRUSR);
+	// 	file = fopen(filenames[i], "r");
 		
-		if (file == NULL) 
-			printf("fopen error\n");
+	// 	if (file == NULL) 
+	// 		printf("fopen error\n");
 		
-		else 
-		{
-			bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
-			fclose(file);
-		}
-	}
+	// 	else 
+	// 	{
+	// 		bytes = fwrite(filenames[i], strlen(filenames[i]), 1, file);
+	// 		fclose(file);
+	// 	}
+	// }
 
-	for(; j < 4; j++)
-	{
-		for (i = 0; i < 10; i++)
-		{
-			file = fopen(filenames[i], "r");
-		}
-	}
+	// for(; j < 4; j++)
+	// {
+	// 	for (i = 0; i < 10; i++)
+	// 	{
+	// 		file = fopen(filenames[i], "r");
+	// 	}
+	// }
 		
 }

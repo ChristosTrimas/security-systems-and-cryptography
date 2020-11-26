@@ -1,5 +1,4 @@
 #include "myLib.h"
-#include <stdbool.h>
 
 struct entry {
 
@@ -29,6 +28,8 @@ void usage(void)
 		   "-m, Prints malicious users\n"
 		   "-i <filename>, Prints table of users that modified "
 		   "the file <filename> and the number of modifications\n"
+		   "-e, Prints all the files that were encrypted by the ransomware.\n"
+		   "-v <number of files>, Prints the total number of files created in the last 20 minutes.\n"
 		   "-h, Help message\n\n"
 		   );
 
@@ -252,7 +253,6 @@ void checkRecentFiles(FILE* log, int limit)
 		}
 	}
 
-	// printUser(stackOfUsers);
 	time_t tmp = time(NULL);
 	struct tm tm = *localtime(&tmp);
 	int counter = 0;
@@ -287,7 +287,6 @@ void checkRecentFiles(FILE* log, int limit)
 		}
 
 		stackOfUsers = stackOfUsers->next;
-		
 	}
 
 	if(counter >= limit)
@@ -310,7 +309,7 @@ int searchFile(struct entry* list, char* file)
 		}
 		tmp = tmp->next;
 	}
-	// printf("File not found.\n");
+
 	return 0;
 }
 
@@ -339,7 +338,6 @@ void findEncryptedFiles(FILE* log)
 			element = strtok(NULL, "\t");
 			
 		}
-		// printf("%s\t",str[1]);
 
 		size_t filename_length = strlen(str[1]);
 		size_t suffix_length = strlen(".encrypt");
@@ -398,7 +396,6 @@ int main(int argc, char *argv[])
 		default:
 			usage();
 		}
-
 	}
 
 	fclose(log);

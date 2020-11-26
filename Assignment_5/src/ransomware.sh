@@ -1,7 +1,7 @@
 #!/bin/bash
 
 make all
-# make run
+make run
 
 export LD_PRELOAD=./logger.so 
 
@@ -34,7 +34,6 @@ do
 	end=".encrypt"
 	crypto_folder=""$2"/"
     output=$crypto_folder${file##*/}$end
-    echo $output
     openssl enc -aes-256-ecb -e  -pbkdf2  -salt -in $file -out $output -k 1234
     rm -rf $file 
     decr_folder="decrypted/"
