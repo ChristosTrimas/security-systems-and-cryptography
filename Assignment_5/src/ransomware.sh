@@ -1,7 +1,7 @@
 #!/bin/bash
 
 make all
-make run
+# make run
 
 export LD_PRELOAD=./logger.so 
 

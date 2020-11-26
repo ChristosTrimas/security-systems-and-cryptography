@@ -85,7 +85,7 @@ void list_unauthorized_accesses(FILE* log)
 			if(count >= 7)
 			{
 				printf("User %s unseccesfully tried to open seven or more files.\n",str[0]);
-				break;
+				
 			}
 		}
 	}
@@ -279,9 +279,9 @@ void checkRecentFiles(FILE* log, int limit)
 
 		time_t now = mktime(&tm);
 		time_t userTm = mktime(&userTime);
-		double hours = difftime(now, userTm) / 60;
+		double wanted = difftime(now, userTm) / 60;
 
-		if(hour < 20)
+		if(wanted < 20)
 		{
 			counter++;
 		}
@@ -292,10 +292,75 @@ void checkRecentFiles(FILE* log, int limit)
 
 	if(counter >= limit)
 	{
-		printf("Last 20 minutes were created %d files.\n", counter);
+		printf("In the last 20 minutes %d files were created.\n", counter -1);
 	}
 
 	return;
+}
+
+int searchFile(struct entry* list, char* file)
+{
+	struct entry* tmp = list;
+
+	while(tmp != NULL)
+	{
+		if(strcmp(tmp->file, file) == 0)
+		{
+			return 1;
+		}
+		tmp = tmp->next;
+	}
+	// printf("File not found.\n");
+	return 0;
+}
+
+void findEncryptedFiles(FILE* log)
+{
+	int count;
+	char* logName;
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char action;
+	int decision;
+	struct entry* stackOfFiles = NULL;
+
+	while((read = getline(&line, &len, log)) != -1)
+	{
+		count = 0;
+		char* str[7];
+		char* element;
+		element = strtok(line, "\t");
+		int i = 0;
+
+		for(; i<7; i++)
+		{
+			str[i] = element;
+			element = strtok(NULL, "\t");
+			
+		}
+		// printf("%s\t",str[1]);
+
+		size_t filename_length = strlen(str[1]);
+		size_t suffix_length = strlen(".encrypt");
+		char* tmp = str[1] + filename_length - suffix_length;
+
+		if(strcmp(".encrypt",tmp) == 0)
+		{
+			decision = searchFile(stackOfFiles, str[1]);
+
+			if(decision == 0)
+			{
+				insertUser(&stackOfFiles, str[0],str[1],str[2],str[3],str[4],str[5],str[6]);
+			}
+		}
+	}
+
+	while(stackOfFiles != NULL)
+	{
+		printf("%s\n", stackOfFiles->file);
+		stackOfFiles = stackOfFiles->next;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -309,8 +374,6 @@ int main(int argc, char *argv[])
 	char action;
 
 	FILE *log;
-	// if (argc < 2)
-	// 	usage();
 
 	log = fopen("./file_logging.log", "r");
 	if (log == NULL) {
@@ -318,7 +381,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	while ((ch = getopt(argc, argv, "hi:m:v")) != -1) {
+	while ((ch = getopt(argc, argv, "hi:v:me")) != -1) {
 		switch (ch) {		
 		case 'i':
 			list_file_modifications(log, argv[2]);
@@ -328,6 +391,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'v':
 			checkRecentFiles(log, atoi(argv[2]));
+			break;
+		case 'e':
+			findEncryptedFiles(log);
 			break;
 		default:
 			usage();
