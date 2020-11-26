@@ -1,9 +1,23 @@
 #include "myLib.h"
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <stdbool.h>
+
+struct entry {
+
+	char *uid; /* user id (positive integer) */
+	char *access_type; /* access type values [0-2] */
+	char *action_denied; /* is action denied values [0-1] */
+
+	char *date; /* file access date */
+	char *time; /* file access time */
+
+	char *file; /* filename (string) */
+	char *fingerprint; /* file fingerprint */
+
+	struct entry *next;
+
+};
+
+struct entry* stackOfUsers;
 
 void usage(void)
 {
@@ -165,6 +179,125 @@ void list_file_modifications(FILE *log, char *file_to_scan)
 	return;
 }
 
+void insertUser(struct entry** list, char* id, char* file, char* date, char* time, char* access_type, char* action_denied, char* fingerprint)
+{
+	struct entry *newNode = NULL;
+    struct entry *prev = *list ;
+
+    newNode = malloc(sizeof(struct entry));
+
+    if(newNode == NULL)
+    {
+    	fprintf (stderr, "Corrupted memory.\n");
+    	exit(0);
+    }
+
+    newNode->uid = malloc(strlen(id) * sizeof(char));
+    strcpy(newNode->uid,id);
+
+    newNode->file = malloc(strlen(file) * sizeof(char));
+    strcpy(newNode->file,file);
+
+    newNode->date = malloc(strlen(date) * sizeof(char));
+    strcpy(newNode->date,date);
+
+    newNode->time = malloc(strlen(time) * sizeof(char));
+    strcpy(newNode->time,time);
+
+    newNode->access_type = malloc(strlen(access_type) * sizeof(char));
+    strcpy(newNode->access_type,access_type);
+
+    newNode->action_denied = malloc(strlen(action_denied) * sizeof(char));
+    strcpy(newNode->action_denied,action_denied);
+
+    newNode->fingerprint = malloc(strlen(fingerprint) * sizeof(char));
+    strcpy(newNode->fingerprint, fingerprint);
+
+    newNode->next =  *list;
+    *list = newNode;
+}
+
+void printUser(struct entry * userList)
+{
+    while (userList != NULL){
+        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",userList->uid, userList->file, userList->date,userList->time,userList->access_type , userList->action_denied,userList->fingerprint);
+        userList = userList->next;
+    }
+}
+
+void checkRecentFiles(FILE* log, int limit)
+{
+	char* line;
+	size_t len;
+	ssize_t read;
+	int i = 0;
+
+	while((read = getline(&line, &len, log)) != -1)
+	{
+		char* element;
+		char* str[7];
+		element = strtok(line, "\t");
+		i = 0;
+
+		while( i < 7)
+		{
+			str[i] = element;
+			element = strtok(NULL, "\t");
+			i++;
+		}
+
+		if(strcmp(str[5],"1"))
+		{
+			insertUser(&stackOfUsers, str[0],str[1],str[2],str[3],str[4],str[5],str[6]);
+		}
+	}
+
+	// printUser(stackOfUsers);
+	time_t tmp = time(NULL);
+	struct tm tm = *localtime(&tmp);
+	int counter = 0;
+
+	while(stackOfUsers != NULL)
+	{
+		int year = atoi(strtok(stackOfUsers->date, "-"));
+		int month = atoi(strtok(NULL, "-"));
+		int day = atoi(strtok(NULL, "-"));
+
+		int hour = atoi(strtok(stackOfUsers->time, ":"));
+		int minute = atoi(strtok(NULL, ":"));
+		int second = atoi(strtok(NULL, ":"));
+
+		struct tm userTime;
+
+		userTime.tm_sec = second;
+		userTime.tm_min = minute;
+		userTime.tm_hour = hour;
+		userTime.tm_mday = day;
+		userTime.tm_mon = month - 1;
+		userTime.tm_year = year - 1900;
+		userTime.tm_isdst = 0;
+
+		time_t now = mktime(&tm);
+		time_t userTm = mktime(&userTime);
+		double hours = difftime(now, userTm) / 60;
+
+		if(hour < 20)
+		{
+			counter++;
+		}
+
+		stackOfUsers = stackOfUsers->next;
+		
+	}
+
+	if(counter >= limit)
+	{
+		printf("Last 20 minutes were created %d files.\n", counter);
+	}
+
+	return;
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -176,8 +309,8 @@ int main(int argc, char *argv[])
 	char action;
 
 	FILE *log;
-	if (argc < 2)
-		usage();
+	// if (argc < 2)
+	// 	usage();
 
 	log = fopen("./file_logging.log", "r");
 	if (log == NULL) {
@@ -185,13 +318,16 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	while ((ch = getopt(argc, argv, "hi:m")) != -1) {
+	while ((ch = getopt(argc, argv, "hi:m:v")) != -1) {
 		switch (ch) {		
 		case 'i':
 			list_file_modifications(log, argv[2]);
 			break;
 		case 'm':
 			list_unauthorized_accesses(log);
+			break;
+		case 'v':
+			checkRecentFiles(log, atoi(argv[2]));
 			break;
 		default:
 			usage();
