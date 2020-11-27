@@ -179,6 +179,61 @@ FILE* fopen(const char *path, const char *mode)
 	return original_fopen_ret;
 }
 
+FILE* fopen64(const char *path, const char *mode) 
+{
+
+	FILE *original_fopen_ret;
+	FILE *(*original_fopen)(const char*, const char*);
+
+	/* call the original fopen function */
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
+	FILE *my_file = original_fopen(path, mode);
+
+	if(my_file == NULL)
+	{
+		// printf("errno = %d\n",errno);
+		if(errno == EACCES || errno == EPERM)
+		{
+			// printf("Error.\n");
+			action_access = 1;
+
+			if(*mode == 119)
+		{
+			noLog(path, 0);
+		}
+
+		else
+			noLog(path, 1);
+		}
+
+		else if(errno == ENOENT)
+		{
+			printf("fopen failed.\n");
+			return my_file;
+		}
+		
+		else
+			return my_file;
+	}
+
+	else
+	{
+		action_access = 0;
+
+		if(*mode == 119)
+		{
+			log_entry(path, 0);
+		}
+		
+		else
+			log_entry(path, 1);
+	}
+
+	original_fopen_ret = (*original_fopen)(path, mode);
+
+	return original_fopen_ret;
+}
+
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) 
 {
 
