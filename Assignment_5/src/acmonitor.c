@@ -247,7 +247,7 @@ void checkRecentFiles(FILE* log, int limit)
 			i++;
 		}
 
-		if(strcmp(str[5],"1"))
+		if(strcmp(str[4],"0")==0)
 		{
 			insertUser(&stackOfUsers, str[0],str[1],str[2],str[3],str[4],str[5],str[6]);
 		}
@@ -291,7 +291,7 @@ void checkRecentFiles(FILE* log, int limit)
 
 	if(counter >= limit)
 	{
-		printf("In the last 20 minutes %d files were created.\n", counter -1);
+		printf("In the last 20 minutes %d files were created.\n", counter);
 	}
 
 	return;
@@ -316,7 +316,6 @@ int searchFile(struct entry* list, char* file)
 void findEncryptedFiles(FILE* log)
 {
 	int count;
-	char* logName;
 	char* line = NULL;
 	size_t len = 0;
 	ssize_t read;

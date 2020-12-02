@@ -20,3 +20,8 @@ To run the operations of the acmonitor:
 
 For the assignment No.5 I decided to make my life easier than the last one and I used data structures. A simple stack did the job to keep all the important information
 for the new functions of the acmonitor.
+
+For -v operation, I stack all the log entries that have create flag on, and after breaking down the date and the time of the files, I enumerate them to check if they are above the time limit the user specifies.
+
+For the -e file, I break down the suffix of each log entry file name and check if it is .encrypt, and after I check that the file is not in the stack already I add it.
+Finally I print the name of the files that are saved in the stack and have .encrypt suffix.
