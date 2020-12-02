@@ -3,19 +3,20 @@ Christos Trimas
 
 How to run:
 
-$make clean
-$make all
-$make run
+For the ransomware script:
 
-Until this point, 10 files will be created with various accesses enabled or disabled. 
-To run the operations of the second task:
+			$bash ransomware.sh <number of files> <name of the file to save them>
 
-./acmonitor -m
+If you want to check the functionality of the logger file from the previous assignment:
+			$make all
+			$make run
 
-or
+To run the operations of the acmonitor:
+			$./acmonitor -i <filename>	, Prints table of users that modified the file given and the number of modifications.(Assignment 4)
+			$./acmonitor -v <num_of_files>  , Prints the total number of files created in the last 20 minutes.
+			$./acmonitor -e			, Prints all the files that were encrypted by the ransomware.
+			$./acmonitor -m			, Prints malicious users.
+			$./acmoniotr -h			, Help message.
 
-./acmonitor -i <filename>
-
-In the folder there is a log file already created but by running make clean you can remove it.
-
-Whenever a user creates a file, the log file keeps track of it and saves it in file_logging.log, with access 0. If the user wants only to open and read a file the access is 1 and for writting the access is 2. If the user has no access to a file, the log file also keeps track of that. By running the acmonitor program, you can keep track of the malicious user and find the number of accesses and modification a user has make to a certain file.
+For the assignment No.5 I decided to make my life easier than the last one and I used data structures. A simple stack did the job to keep all the important information
+for the new functions of the acmonitor.
