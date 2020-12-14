@@ -5,7 +5,7 @@ How to run:
 
 For the ransomware script:
 
-			$bash ransomware.sh <number of files> <name of the file to save them>
+			$bash ransomware.sh <number of files> <name of the f to save them>
 
 If you want to check the functionality of the logger file from the previous assignment:
 			$make all
@@ -18,6 +18,9 @@ To run the operations of the acmonitor:
 			$./acmonitor -m			, Prints malicious users.
 			$./acmoniotr -h			, Help message.
 
+To clear unwanted files run:
+			$make clean
+			
 For the assignment No.5 I decided to make my life easier than the last one and I used data structures. A simple stack did the job to keep all the important information
 for the new functions of the acmonitor.
 
