@@ -10,10 +10,20 @@ function adBlock() {
         exit 1
     fi
     if [ "$1" = "-domains"  ]; then
-        # Configure adblock rules based on the domain names of $domainNames file.
-        # Write your code here...
-        # ...
-        # ...
+        _input="domainNames.txt"
+        [ ! -f "$_input" ] && { echo "$0: File $_input not found."; exit 1; }
+        IPT=/sbin/iptables
+        $IPT -N blacklist
+        egrep -v "^#|^$" x | while IFS= read -r ip
+        do
+        	# Append everything to droplist
+			$IPT -A blacklist -i ${_pub_if} -s $ip -j REJECT
+		done <"${_input}"
+ 
+		# Finally, insert or append our black list 
+		$IPT -I INPUT -j blacklist
+		$IPT -I OUTPUT -j blacklist
+		$IPT -I FORWARD -j blacklist
         true
             
     elif [ "$1" = "-ips"  ]; then
@@ -37,6 +47,7 @@ function adBlock() {
         sudo iptables -P OUTPUT ACCEPT
         sudo iptables -P FORWARD ACCEPT
         sudo iptables -F
+        sudo iptables -X
         true
 
         
