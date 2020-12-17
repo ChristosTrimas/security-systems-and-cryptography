@@ -26,8 +26,7 @@ function adBlock() {
     elif [ "$1" = "-save"  ]; then
         # Save rules to $adblockRules file.
         # Write your code here...
-        # ...
-        # ...
+        sudo iptables-save adblockRules
         true
         
     elif [ "$1" = "-load"  ]; then
