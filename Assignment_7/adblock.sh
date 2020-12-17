@@ -47,10 +47,7 @@ function adBlock() {
 
         
     elif [ "$1" = "-list"  ]; then
-        # List current rules.
-        # Write your code here...
-        # ...
-        # ...
+        sudo iptables -L -n -v
         true
         
     elif [ "$1" = "-help"  ]; then
