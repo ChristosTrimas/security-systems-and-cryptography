@@ -33,10 +33,10 @@ function adBlock() {
 
         
     elif [ "$1" = "-reset"  ]; then
-        # Reset rules to default settings (i.e. accept all).
-        # Write your code here...
-        # ...
-        # ...
+        sudo iptables -P INPUT ACCEPT
+        sudo iptables -P OUTPUT ACCEPT
+        sudo iptables -P FORWARD ACCEPT
+        sudo iptables -F
         true
 
         
