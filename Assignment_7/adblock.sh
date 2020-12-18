@@ -13,17 +13,17 @@ function adBlock() {
         _input="domainNames.txt"
         [ ! -f "$_input" ] && { echo "$0: File $_input not found."; exit 1; }
         IPT=/sbin/iptables
-        $IPT -N blacklist
-        egrep -v "^#|^$" x | while IFS= read -r ip
+        egrep -v "^#|^$" x | while IFS= read -r domain
         do
         	# Append everything to droplist
-			$IPT -A blacklist -i ${_pub_if} -s $ip -j REJECT
+        	dig +short $domain &>> sth.txt
+			# $IPT -A blacklist -i ${_pub_if} -s $ip -j REJECT
 		done <"${_input}"
- 
-		# Finally, insert or append our black list 
-		$IPT -I INPUT -j blacklist
-		$IPT -I OUTPUT -j blacklist
-		$IPT -I FORWARD -j blacklist
+		sth="sth.txt"
+		egrep -v "^#|^$" x | while IFS= read -r ip
+		do
+			sudo $IPT -A INPUT -s $ip -j REJECT
+		done <"${sth}"
         true
             
     elif [ "$1" = "-ips"  ]; then
