@@ -11,16 +11,18 @@ function adBlock() {
     fi
     if [ "$1" = "-domains"  ]; then
         
-        _input="domainNames.txt"
-        [ ! -f "$_input" ] && { echo "$0: File $_input not found."; exit 1; }
+        input=$domainNames
+        [ ! -f "$input" ] && { echo "$0: File $input not found."; exit 1; }
+
         IPT=/sbin/iptables
+        
         egrep -v "^#|^$" x | while IFS= read -r domain
         do
         	# get the ip addr of the domain
-        	dig +short $domain &>> sth.txt
-		done <"${_input}"
+        	dig +short $domain &>> IPAddresses.txt
+		done <"${input}"
 
-		sth="sth.txt"
+		sth="IPAddresses.txt"
 		
 		egrep -v "^#|^$" x | while IFS= read -r ip
 		
@@ -31,10 +33,17 @@ function adBlock() {
         true
             
     elif [ "$1" = "-ips"  ]; then
-        # Configure adblock rules based on the IP addresses of $IPAddresses file.
-        # Write your code here...
-        # ...
-        # ...
+
+    	input=$IPAddresses
+        [ ! -f "$input" ] && { echo "$0: File $_input not found."; exit 1; }
+        
+        IPT=/sbin/iptables
+        
+        egrep -v "^#|^$" x | while IFS= read -r ip
+		
+		do
+			sudo $IPT -A INPUT -s $ip -j REJECT
+		done <"${input}"
         true
         
     elif [ "$1" = "-save"  ]; then
