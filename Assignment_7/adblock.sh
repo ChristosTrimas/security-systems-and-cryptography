@@ -28,6 +28,8 @@ function adBlock() {
 		
 		do
 			sudo $IPT -A INPUT -s $ip -j REJECT
+			sudo $IPT -A FORWARD -s $ip -j REJECT
+			sudo $IPT -A OUTPUT -d $ip -j REJECT
 		done <"${sth}"
         
         true
@@ -43,6 +45,8 @@ function adBlock() {
 		
 		do
 			sudo $IPT -A INPUT -s $ip -j REJECT
+			sudo $IPT -A FORWARD -s $ip -j REJECT
+			sudo $IPT -A OUTPUT -d $ip -j REJECT
 		done <"${input}"
         true
         
