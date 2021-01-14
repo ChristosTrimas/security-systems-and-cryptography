@@ -19,3 +19,5 @@ To run the program:
 	$python2 shell.py > exploit.txt
 	$(cat exploit.txt ;cat)| ./Greeter
 	$ls(new terminal)
+
+Make sure to have python version 2 installed, otherwise it will not compile the shell.py.
