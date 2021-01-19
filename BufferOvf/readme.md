@@ -16,8 +16,12 @@ After the creation of exploit.txt, I simple run the Greeter(see below how to run
 
 To run the program:
 
+	$make all
+
+	or
+	
 	$python2 shell.py > exploit.txt
 	$(cat exploit.txt ;cat)| ./Greeter
-	$ls(new terminal)
+	$ls(new terminal) or any other command you want
 
 Make sure to have python version 2 installed, otherwise it will not compile the shell.py.
